@@ -22,7 +22,7 @@ const AdminLoginBox = () =>{
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((adminData)=>{
             setErrorMessage('');
-            navigate('/park/admin/profile', {state: {admin: adminData}})
+            navigate('/park/admin/main', {state: {admin: adminData}})
          })
         .catch(error=>{
             setErrorMessage('Wrong username or password');

@@ -5,24 +5,25 @@
   
   /* Style the track (background of the scrollbar) */
   ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background:rgb(45, 46, 46);
     border-radius: 10px;
   }
   
   /* Style the handle (scroll thumb) */
   ::-webkit-scrollbar-thumb {
-    background: #0ec5f3;
+    background: #ADEFD1FF;
     border-radius: 10px;
   }
   
   /* Style the handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: #00c8ff;
+    background: #00203FFF;
   }
   
 html, body{
     margin: 0;
     padding: 0;
+    background-color: #00203FFF;
     /* height: 100vh; */
 }
 .formBox{
@@ -100,14 +101,14 @@ label{
     border-radius: 1rem;
     box-sizing: border-box;
     cursor: pointer;
-    background-color: rgb(31, 186, 247);
-    color: white;
+    background-color: #ADEFD1FF;
+    color: #00203FFF;
     text-decoration: none;
 }
 
 .backButton:hover{
-    background-color: rgba(141,247,241,1);
-    color: black;
+    background-color: #00203FFF;
+    color: #ADEFD1FF;
 }
 
 .loginButton:hover, .signupButton:hover{
@@ -268,30 +269,37 @@ center{
     top: 1rem;
     bottom: 1rem;
     border-radius: 1rem;
-    position:absolute;
-    z-index: 1;
-    background-color:rgb(0, 217, 255);
-    width: 25%;
-    animation: slide-in 1s ease-in forwards;
+    /* position:absolute; */
+    /* z-index: 1; */
+    /* background-color:rgb(0, 217, 255); */
+    /* width: 25%; */
+    width: inherit;
+    height: inherit;
+    /* animation: slide-in 1s ease-in forwards; */
     padding: 1rem;
     font-size: 1.5rem;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     font-family:'Times New Roman', Times, serif;
+    background-color:#00203FFF;
+    color:  #ADEFD1FF;
 }
 
 .navigationBox{
     position: absolute;
-    z-index: 2;
-    background-color: #0ec5f367;
-    border-radius: 2rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    /* z-index: 1; */
+    /* background-color: #0ec5f367; */
+    /* display: flex; */
+    /* border-radius: 2rem; */
+    /* align-items: center; */
+    /* justify-content: space-around;*/
+    width: 50%; 
 }
 
 .routerBox, .routerInfo{
     display: flex;
     background-color: transparent;
-    justify-content: center;
+    justify-content: space-evenly;
+    width: fit-content;
     align-items: center;
     font-size: 1.5rem;
 }
@@ -306,6 +314,28 @@ center{
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9);
     }
 }
 
@@ -329,8 +359,15 @@ center{
     cursor: pointer;
     height: 3rem;
     border-radius: 50%;
+    border: 1px solid transparent
 }
 
 .profileIcon:hover{
-    background-color: #cccccc69;
+    border: 1px solid black;
+    border-radius: 50%;
 }
+
+.profileIcon:active{
+    background-color: #ADEFD1FF;
+}
+
