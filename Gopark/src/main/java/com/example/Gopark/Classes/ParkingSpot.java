@@ -9,6 +9,4 @@ public class ParkingSpot {
     private int number;
     private String type;
     private String RealTimeState;  //Occupied , Available , //reserved
-
-
 }
