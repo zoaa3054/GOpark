@@ -1,7 +1,10 @@
 package com.example.Gopark.Services;
 
 import com.example.Gopark.Classes.ManagerReportData;
+import com.example.Gopark.Classes.TopDriver;
+import com.example.Gopark.Classes.TopParkingLot;
 import com.example.Gopark.Classes.Violation;
+import com.example.Gopark.DAOS.DriverDAO;
 import com.example.Gopark.DAOS.ParkingLotDAO;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -16,10 +19,12 @@ import java.util.Map;
 public class ReportingService {
 
     private final ParkingLotDAO parkingLotDAO;
+    private final DriverDAO driverDAO;
 
     @Autowired
-    public ReportingService(ParkingLotDAO parkingLotDAO) {
+    public ReportingService(ParkingLotDAO parkingLotDAO, DriverDAO driverDAO) {
         this.parkingLotDAO = parkingLotDAO;
+        this.driverDAO = driverDAO;
     }
 
 
@@ -50,6 +55,37 @@ public class ReportingService {
 
             // Export the report (PDF example)
             JasperExportManager.exportReportToPdfFile(jasperPrint, "ManagerReport.pdf");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getAdminReport()
+    {
+        String path = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\AdminReport.jrxml";
+
+        // Get the data for the top 10 drivers
+        List<TopDriver> topDrivers = driverDAO.getTopDrivers();
+
+        // Get the data for the top parking lots
+        List<TopParkingLot> topParkingLots = parkingLotDAO.getTopParkingLots();
+
+        // Create data sources
+        JRBeanCollectionDataSource driversDataSource = new JRBeanCollectionDataSource(topDrivers);
+        JRBeanCollectionDataSource lotsDataSource = new JRBeanCollectionDataSource(topParkingLots);
+
+        // Parameters for the report
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("driversDataSource", driversDataSource);
+        parameters.put("lotsDataSource", lotsDataSource);
+
+        // Compile and generate the report
+        try {
+            JasperReport jasperReport = JasperCompileManager.compileReport(path);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            // Export the report (PDF example)
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "AdminReport.pdf");
         } catch (Exception e) {
             e.printStackTrace();
         }

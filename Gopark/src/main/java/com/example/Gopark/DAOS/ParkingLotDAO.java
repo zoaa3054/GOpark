@@ -1,9 +1,6 @@
 package com.example.Gopark.DAOS;
 
-import com.example.Gopark.Classes.ParkingLot;
-import com.example.Gopark.Classes.ParkingSpot;
-import com.example.Gopark.Classes.ManagerReportData;
-import com.example.Gopark.Classes.Violation;
+import com.example.Gopark.Classes.*;
 import org.springframework.data.geo.Point;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -99,4 +96,19 @@ public class ParkingLotDAO {
     }
 
 
+
+    public List<TopParkingLot> getTopParkingLots() {
+        String sql = "SELECT r.lot_id, l.name AS lot_name, SUM(r.cost) AS total_revenue "
+                + "FROM Reservation r "
+                + "JOIN Parking_Lot l ON r.lot_id = l.id "
+                + "GROUP BY r.lot_id "
+                + "ORDER BY total_revenue DESC";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            TopParkingLot lot = new TopParkingLot();
+            lot.setLotId(rs.getLong("lot_id"));
+            lot.setLotName(rs.getString("lot_name"));
+            lot.setTotalRevenue(rs.getDouble("total_revenue"));
+            return lot;
+        });
+    }
 }

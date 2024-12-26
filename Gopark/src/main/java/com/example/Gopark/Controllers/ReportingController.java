@@ -10,11 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportingController {
 
     @Autowired
-    ReportingService service;
+    private ReportingService service;
+
     @GetMapping("/manager/report/{managerId}")
-    public void exportReport(@PathVariable Long managerId )
+    public void exportManagerReport(@PathVariable Long managerId )
     {
          service.getManagerReports(managerId);
+    }
+    @GetMapping("/admin/report/{adminId}")
+    public void exportAdminReport(@PathVariable Long  adminId)
+    {
+        service.getAdminReport();
     }
 
 
