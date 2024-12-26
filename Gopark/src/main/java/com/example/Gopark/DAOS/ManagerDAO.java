@@ -32,4 +32,21 @@ public class ManagerDAO {
             throw new RuntimeException("Failed to insert manager: " + e.getMessage(), e);
         }
     }
+
+    public Manager login(String emailAddress, String password) {
+        String sql = "SELECT * FROM MANAGER WHERE email = ? AND password = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
+                Manager manager = new Manager();
+                manager.setId(rs.getInt("id"));
+                manager.setUserName(rs.getString("username"));
+                manager.setPassword(rs.getString("password"));
+                manager.setEmailAddress(rs.getString("email"));
+                manager.setPhoneNumber(rs.getString("phone"));
+                return manager;
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Login failed: Invalid username or password", e);
+        }
+    }
 }

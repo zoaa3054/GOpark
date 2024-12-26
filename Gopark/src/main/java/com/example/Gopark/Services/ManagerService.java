@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 public class ManagerService {
     @Autowired
     ManagerDAO managerDAO;
+
+    public Manager getManager(String emailAddress, String password) {
+        return managerDAO.login(emailAddress, password);
+    }
+
     public Manager addnewManager(Manager manager) {
         return managerDAO.insertManager(manager);
     }
