@@ -1,6 +1,8 @@
 package com.example.Gopark.DAOS;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class ParkingSpotDAO {
 
-    //TODO : add Trigger to change spot status and current price of the lot
 }

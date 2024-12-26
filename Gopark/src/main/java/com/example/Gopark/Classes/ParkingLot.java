@@ -6,7 +6,7 @@ import org.springframework.data.geo.Point;
 @Data
 public class ParkingLot {
     private Long id;
-    private Point location; // Use a suitable type for spatial data (e.g., org.locationtech.jts.geom.Point if using JTS library)
+    private Point location;
     private Float basePrice;
     private String name;
     private Long managerId;
