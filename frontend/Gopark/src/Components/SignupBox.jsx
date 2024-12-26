@@ -4,7 +4,6 @@ import '../style.css';
 import 'react-phone-number-input/style.css'
 import PhoneInput, {isValidPhoneNumber} from 'react-phone-number-input'
 import countryNames from 'react-phone-number-input/locale/en'
-import {jwtDecode} from 'jwt-decode';
 import emailjs from 'emailjs-com';
 
 
@@ -25,52 +24,6 @@ const SignupBox = () =>{
     const [trueCode, setTrueCode] = useState('');
     const navigate = useNavigate();
 
-    const handleCallbackResponse = async (response)=>{
-        var user = jwtDecode(response.credential);
-        console.log(user);
-        const register = await fetch(`http://localhost:8081/api/5/users/g/signup`,{
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json',
-                'IDToken': response.credential
-            },
-            body: JSON.stringify({
-                userID: '',
-                userName: user.name,
-                email: user.email,
-                password: '',
-                phone: '',
-                gender: 'UNKNOWN',
-                photo: '',
-                description: '',
-                theme: 'LIGHT'
-            })
-         })
-        .then(Response=>Response.status==200 || Response.status==201? (() => { return Response.json() })():(() => { throw new Error('Something went wrong');})())
-        .then((userData)=>{
-            console.log(userData);
-            navigate('/profile', {state: {user: userData}});
-        })
-        .catch(error=>{
-            console.log(error);
-            setErrorMessage('Email already exists in the system');
-            setErrorTrigger('googleEmailError');
-        });
-      } 
-      useEffect(()=>{
-    
-        google.accounts.id.initialize({
-          client_id: "717049175258-p8ir5a7n56utrq80bc4o2roi8oaf1ulh.apps.googleusercontent.com", 
-          callback: handleCallbackResponse
-        });
-    
-        google.accounts.id.renderButton(
-          document.getElementById("signupGoogleButton"),
-          {theme: "outline", size: "larg"}
-        );
-    
-        google.accounts.id.prompt();
-      }, []);
       
     const generateCode = ()=>{
         let generatedCode = '';
@@ -87,24 +40,24 @@ const SignupBox = () =>{
         console.log(c)
         setTrueCode(c);
         if (phone && isValidPhoneNumber(phone)){  
-            // should be removed after uncommenting                  
-            setPhase(2);
-            // emailjs
-            //     .send(
-            //         'service_j4cifp3', // Replace with your EmailJS Service ID
-            //         'template_zlx3hfj', // Replace with your EmailJS Template ID
-            //         {email: email, to_name: username, code: c},
-            //         '6nj8Z27gLH-R_ZFsc' // Replace with your EmailJS User ID
-            //     )
-            //     .then(
-            //         (result) => {
-            //             console.log('Email sent successfully!');
-            //             setPhase(2);
-            //         },
-            //         (error) => {
-            //             alert('Failed to send email.');
-            //         }
-            //     );
+            // // should be removed after uncommenting                  
+            // setPhase(2);
+            emailjs
+                .send(
+                    'service_j4cifp3', // Replace with your EmailJS Service ID
+                    'template_zlx3hfj', // Replace with your EmailJS Template ID
+                    {email: email, to_name: username, code: c},
+                    '6nj8Z27gLH-R_ZFsc' // Replace with your EmailJS User ID
+                )
+                .then(
+                    (result) => {
+                        console.log('Email sent successfully!');
+                        setPhase(2);
+                    },
+                    (error) => {
+                        alert('Failed to send email.');
+                    }
+                );
         }else{
             setErrorMessage("Phone number is not correct");
             setErrorTrigger("phoneError");
@@ -123,28 +76,29 @@ const SignupBox = () =>{
     }
 
     const signup = async ()=>{
-        let userID = generateCode();
-        const register = await fetch(`http://localhost:8081/api/5/users/signup`,{
+        const register = await fetch(`http://localhost:8081/api/v1/users/signup`,{
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json',
-                'UserID': userID
             },
             body: JSON.stringify({
-                userID: userID,
-                userName: username,
+                username: username,
                 email: email,
                 password: password,
                 phone: phone,
-                gender: gender,
-                photo: '',
-                description: '',
-                theme: 'LIGHT'
+                carID: '',
+                visaCard: 
+                    {
+                        cardNumber: '',
+                        cardHolder: '',
+                        expirationDate: '',
+                        CVV:''
+                    }
             })
          })
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((userData)=>{
-            navigate('/profile', {state: {user: userData}})
+            navigate('/main', {state:{user: userData}});
         })
         .catch(error=>{
             setErrorMessage("Email already exists");
@@ -193,29 +147,14 @@ const SignupBox = () =>{
                     <label htmlFor="phone"><b>Phone</b></label>
                     <PhoneInput className="phoneInput" international placeholder="Enter phone number" value={phone} onChange={setPhone} isValidPhoneNumber required/>
                     {errorTrigger == "phoneError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>}
-                    {/* <label htmlFor="city"><b>City</b></label>
-                    <input type="text" name='city' placeholder="City" value={city} onChange={(e)=>setCity(e.target.value)} required></input>
-                    <label htmlFor="address"><b>Address</b></label>
-                    <input type="text" name='address' placeholder="Address" value={address} onChange={(e)=>setAddress(e.target.value)} required></input> */}
-                    <label htmlFor="gender"><b>Gender</b></label>
-                    <div className="gender">
-                        <div>
-                            <label htmlFor="male">Male</label>
-                            <input type="radio" name='gender' onClick={()=>setGender("MALE")} required></input>
-                        </div>
-                        <div>
-                            <label htmlFor="female">Female</label>
-                            <input type="radio" name='gender' onClick={()=>setGender("FEMALE")}></input>
-                        </div>
-                    </div>
                     <button className="signupButton" type="submit" form="signupForm">Signup</button>
                 </form>
             )}
             {phase==1 && (
                 <>
                 <p className="lineWithText"><span>Or</span></p>
-                <div id="signupGoogleButton"></div>
-                {errorTrigger == "googleEmailError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>}
+                {/* <div id="signupGoogleButton"></div>
+                {errorTrigger == "googleEmailError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>} */}
                 <center>Already have an account? <Link className="loginLink" to="/login">Login</Link></center>
                 </>
             )}

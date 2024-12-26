@@ -12,17 +12,18 @@ const AdminLoginBox = () =>{
 
     const login = async (e)=>{
         e.preventDefault()
-        const adminFetched = await fetch(`http://localhost:8081/api/6/park/admin/login`, {
+        const adminFetched = await fetch(`http://localhost:8081/api/v1/lot/admins/login`, {
             method: "GET",
             headers:{
                 'UserName': username,
                 'Password': password
             }
         })
-        .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
-        .then((adminData)=>{
+        .then(response=>response.status==200 || response.status==201?(() => { return response.text() })():(() => { throw new Error('Something went wrong'); })())
+        .then((lotData)=>{
+            console.log(lotData);
             setErrorMessage('');
-            navigate('/park/admin/main', {state: {admin: adminData}})
+            navigate('/park/admin/main', {state:{lot: lotData}})
          })
         .catch(error=>{
             setErrorMessage('Wrong username or password');
@@ -32,7 +33,7 @@ const AdminLoginBox = () =>{
     return(
         <div className="formBox">
             <form id="loginForm" onSubmit={login}>
-                <header>Admin Login</header>
+                <header>Park Admin Login</header>
                 <label htmlFor='username'><b>Username</b></label>
                 <input type="text" name='username' placeholder="Username" value={username} onChange={(e)=>setUsername(e.target.value)} required></input>
                 <label htmlFor="password"><b>Password</b></label>

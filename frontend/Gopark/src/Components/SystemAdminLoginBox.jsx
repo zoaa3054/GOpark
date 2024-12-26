@@ -12,7 +12,7 @@ const AdminLoginBox = () =>{
 
     const login = async (e)=>{
         e.preventDefault()
-        const adminFetched = await fetch(`http://localhost:8081/api/7/park/admin/login`, {
+        const adminFetched = await fetch(`http://localhost:8081/api/v1/system/admin/login`, {
             method: "GET",
             headers:{
                 'UserName': username,
@@ -20,9 +20,10 @@ const AdminLoginBox = () =>{
             }
         })
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
-        .then((adminData)=>{
+        .then((adminLotsData)=>{
+            console.log(adminLotsData);
             setErrorMessage('');
-            navigate('/system/admin/main', {state: {admin: adminData}})
+            navigate('/system/admin/main', {state: {lots: adminLotsData}});
          })
         .catch(error=>{
             setErrorMessage('Wrong username or password');
@@ -32,7 +33,7 @@ const AdminLoginBox = () =>{
     return(
         <div className="formBox">
             <form id="loginForm" onSubmit={login}>
-                <header>Admin Login</header>
+                <header>System Admin Login</header>
                 <label htmlFor='username'><b>Username</b></label>
                 <input type="text" name='username' placeholder="Username" value={username} onChange={(e)=>setUsername(e.target.value)} required></input>
                 <label htmlFor="password"><b>Password</b></label>

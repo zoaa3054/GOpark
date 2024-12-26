@@ -1,22 +1,45 @@
-import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer, Autocomplete, DirectionsRenderer } from "@react-google-maps/api";
-import { useRef, useState } from 'react';
+import { Autocomplete } from "@react-google-maps/api";
+import { useEffect, useRef, useState } from 'react';
 import '../style.css';
+import PropTypes from 'prop-types';
+import { toast } from "react-toastify";
+
 const statusColorMaper = {
     'OCCUPOID': 'red',
     'AVAILABLE': '#44ea3b',
-    'RESERVED': '#ea3b98'
+    'RESERVED': '#ea3b98',
+    'NULL': 'white'
 };
-const ParkBox = ({ park, person, getRout }) =>{
-    const firstHalfLots = park.lots.slice(0, Math.ceil(park.lots.length / 2));
-    const secondHalfLots = park.lots.slice(Math.ceil(park.lots.length / 2), park.lots.length);
+const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
+    const [firstHalfSpots, setFirstHalfSpots] = useState([]);
+    const [secondHalfSpots, setSecondHalfSpots] = useState([]);
+    const [parkSpots, setParkSpots] = useState([{number: 1, status: 'OCCUPOID', freeAt:"3PM"}, {number: 2, status: 'RESERVED', freeAt:"4PM"}, {number: 3, status: 'AVAILABLE', freeAt:"now"}, {number: 4, status: 'OCCUPOID', freeAt:"5PM"}]);
     const [isHoverd, setIsHoverd] = useState(false);
     const [hoverdObj, setHoverdObj] = useState(NaN);
     const [showOriginInput, setShowOriginInput] = useState(false);
-    const [directions, setDirections] = useState(null);
-    const [distance, setDistance] = useState('');
-    const [duration, setDuration] = useState('');
+    const [counter, setCounter] = useState(0);
     const origin = useRef();
     const targetRef = useRef(null);
+
+    // useEffect refreshes the spots every second
+    useEffect(()=>{
+        let interval = setInterval(()=>{
+            getSpots();
+        }, 1000);
+
+        setFirstHalfSpots(()=>parkSpots.slice(0, Math.ceil(parkSpots.length / 2)));
+        setSecondHalfSpots(()=>parkSpots.slice(Math.ceil(parkSpots.length / 2), parkSpots.length));
+
+        return ()=>clearInterval(interval);
+    }, [parkSpots]);
+
+    const notifySuccessReserving = () => {
+        toast.success(`Spot Reserved successfully`);
+    };
+
+    const notifyFaildReserving = () => {
+        toast.error(`Faild to reserve spot`);
+    };
 
     const handleScroll = () => {
         if (targetRef.current) {
@@ -25,63 +48,52 @@ const ParkBox = ({ park, person, getRout }) =>{
         }
     }
 
-    const go = async ()=>{
-        if(origin.current.value === '' || destination.current.value === '')
-            return
-        const destinationService = new google.maps.DirectionsService();
-        const result = await destinationService.route({
-            origin: origin.current.value,
-            destination: destination.current.value,
-            travelMode: google.maps.TravelMode.DRIVING
-        });
-        setDirections(result);
-        setDistance(result.routes[0].legs[0].distance.text);
-        setDuration(result.routes[0].legs[0].duration.text);
-    }
+    const getSpots = async()=>{
+        await fetch(`http://localhost:8081/api/v1/getSpots?parkID=${lot.ID}`)
+        .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error reserving spot")})())
+        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots);})
+        .catch(e=>console.error(e));
+    }    
 
-    const reserveLot = async(lot)=>{
-        if (lot.status == 'AVAILABLE'){
-            const reservationTime = window.prompt("Please enter amount of time you whant to reserve your lot in hours");
+    const reserveSpot = async(spot)=>{
+        if (spot.status == 'AVAILABLE'){
+            const reservationTime = window.prompt("Please enter amount of time you whant to reserve your spot in hours");
             if (reservationTime===null || reservationTime.valueOf() > 5 || reservationTime.valueOf() <= 0){
                 alert(`Sorry allowed time for reservation is from 1 to 5 hours`);
                 return;
             }
-            const confermatoin = window.confirm(`You are now about to reserve lot number: ${lot.number} in ${park.name} park\nPress confirm to conferm your reservation.`);
+            const confermatoin = window.confirm(`You are now about to reserve spot number: ${spot.number} in ${lot.name} lot\nPress confirm to conferm your reservation.`);
             if (confermatoin){
-                // const regester = await fetch(`http://localhost:8081/reserveLot`, {
-                //     method: 'PUT',
-                //     headers: {
-                //         'User': person.ID,
-                //         'ParkID': park.ID,
-                //         'LotNum': lot.number
-                //     }
-                // })
-                // .catch(e=>{console.log(e); alert("Error reserving the lot")});
-                alert("Your slot is reserved");
+                const regester = await fetch(`http://localhost:8081/api/v1/users/reserveSpot?parkID=${lot.ID}&spotNumber=${spot.number}`, {
+                    method: 'PUT',
+                })
+                .then(response=>response.status==200 || response.status==201? notifySuccessReserving(): (()=>{throw Error("Error reserving spot")})())
+                .catch(e=>{console.log(e); notifyFaildReserving()});
+                
             }
         }
         else{
-            alert(`Sorry this lot is ${lot.status}`);
+            alert(`Sorry this spot is ${spot.status}`);
         }
     }
     return(
         <div className="parkContainerStyle">
-            <center style={{fontSize: "2rem"}}>{park.name} Park</center>
-            <p>Location: {park.locationString}</p>
-            <p>Capacity: {park.capacity}</p>
-            <p>Type: {park.type}</p>
-            <p>Pricing structure: {park.pricingStruct}</p>
+            <center style={{fontSize: "2rem"}}>{lot.name} lot</center>
+            {/* <p>Location: {lot.locationString}</p> */}
+            <p>Capacity: {lot.capacity}</p>
+            <p>Type: {lot.type}</p>
+            <p>Pricing structure: {lot.pricingStruct}</p>
             <div className='parkingLots'>
                 <div className='leftLots'>
-                    {firstHalfLots.map((l, i)=>(
-                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.status]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.status]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)} onClick={()=>reserveLot(l)}>
+                    {firstHalfSpots.map((l, i)=>(
+                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.status]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.status]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)} onClick={()=>reserveSpot(l)}>
                             <p>{l.number}</p>
                         </div>)
                     )}
                 </div>
                 <div className='rightLots'>
-                    {secondHalfLots.map((l, i)=>(
-                        <div className='lot' key={i+firstHalfLots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.status]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfLots.length ?statusColorMaper[l.status]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)} onClick={()=>reserveLot(l)}>
+                    {secondHalfSpots.map((l, i)=>(
+                        <div className='lot' key={i+firstHalfSpots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.status]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfSpots.length ?statusColorMaper[l.status]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)} onClick={()=>reserveSpot(l)}>
                             <p>{l.number}</p>
                         </div>)
                     )}
@@ -91,7 +103,7 @@ const ParkBox = ({ park, person, getRout }) =>{
             {showOriginInput && <center style={{display:"flex", justifyContent:"center"}}><Autocomplete options={{componentRestrictions: { country: "br" }}}>
                                             <input type="text" placeholder="Origin"  ref={origin}/>
                                         </Autocomplete>
-                                        <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, park.locationCoor)}>Go</button>
+                                        <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, lot.locationCoor)}>Go</button>
                                         </center>}
             {person == "admin" && 
             <div className='analysisArea'>
@@ -108,3 +120,9 @@ const ParkBox = ({ park, person, getRout }) =>{
     );
 };
 export default ParkBox;
+
+ParkBox.propTypes = {
+    lot: PropTypes.object,
+    person: PropTypes.string,
+    getRout: PropTypes.func
+}

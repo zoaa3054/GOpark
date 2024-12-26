@@ -14,18 +14,19 @@ const AddAdminBox = () =>{
 
     const addAdmin = async (e)=>{
         e.preventDefault()
-        console.log({
-            'UserName': username,
-            'Password': password,
-            'SuperID': 12345
-        });
-        const loginUser = await fetch(`http://localhost:8081/api/6/admin/signup`, {
+
+        const loginUser = await fetch(`http://localhost:8081/api/v1/system/admin/addAdmin`, {
+            
             method: "POST",
             headers:{
-                'UserName': username,
-                'Password': password,
-                'SuperID': 12345
-            }
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify(
+                {
+                    'UserName': username,
+                    'Password': password
+                }
+            )
         })
         .then(response=>{response.status==200 || response.status==201?(() => { setErrorMessage('');alert("Admin added successfully"); })():(() => { throw new Error('Something went wrong'); })()})
         .catch(async (error)=>{

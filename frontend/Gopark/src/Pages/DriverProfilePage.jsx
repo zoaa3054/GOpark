@@ -3,32 +3,56 @@ import styled from 'styled-components';
 import unknownPhoto from '../assets/unknown.png'; // Adjust the path as necessary
 import UploadPhoto from '../Components/UploadPhoto';
 import ChangePassword from '../Components/ChangePassword';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useAsyncError, useLocation, useNavigate } from 'react-router-dom';
 import edit from '../assets/edit.png'
 import '../style.css';
+import { toast } from 'react-toastify';
+
 const DriverProfilePage = () => {
   const location = useLocation();
-  const { user } = location.state || {username: "Ibrahim", gender: "Male", email: "abc@example.com", phoneNumber: "01234567891", profilePhoto: ""};
+  const { userLoaded } = location.state || {username: "", password: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
+  const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isUploadPhotoOpen, setIsUploadPhotoOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    gender: '',
-    phoneNumber: ''
+    phone: ''
   });
-  const [profilePhoto, setProfilePhoto] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
+    setUser(userLoaded);
     setFormData({
-      username: user.username,
-      email: user.email,
-      gender: user.gender,
-      phoneNumber: user.phoneNumber || ''
+      cardNumber: userLoaded.visaCard.cardNumber, 
+      cardHolder: userLoaded.visaCard.cardHolder, 
+      expirationDate: userLoaded.visaCard.expirationDate, 
+      CVV: userLoaded.visaCard.CCV
     });
-    setProfilePhoto(user.profilePhoto || unknownPhoto);
   }, []);
+
+  const notifySuccessVisaAdding = () =>{
+    toast.success("VISA card added successfully");
+  }
+
+  const notifyFaildVisaAdding = () =>{
+    toast.error("Faild to add VISA card");
+  }
+  const validate = () =>{
+    const newErrors = {};
+    if (!/^\d{16}$/.test(formData.cardNumber)){
+      newErrors.cardNumber = "Card number must be 16 digits."
+    }
+    if (!/^[a-zA-Z\s]+$/.test(formData.cardHolder)){
+      newErrors.cardHolder = "Cardholder name can only contain letters."
+    }
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expirationDate)){
+      newErrors.expirationDate = "Expiration date must be in MM/YY format."
+    }
+    if (!/^\d{3}$/.test(formData.CVV)){
+      newErrors.CVV = "CVV must be 3 digits."
+    }
+    setErrors(newErrors);
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,24 +66,30 @@ const DriverProfilePage = () => {
   const handleCancelClick = () => {
     setIsEditing(false);
     setFormData({
-      username: user.username,
-      email: user.email,
-      gender: user.gender,
-      phoneNumber: user.phoneNumber || ''
+      cardNumber: user.visaCard.cardNumber, 
+      cardHolder: user.visaCard.cardHolder, 
+      expirationDate: user.visaCard.expirationDate, 
+      CVV:user.visaCard.CCV
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    validate();
+    if (Object.keys(errors).length != 0) return;
     try {
-      const token = localStorage.getItem('drip_me_up_jwt');
-      const response = await fetch('http://localhost:8081/users/', {
+      const response = await fetch('http://localhost:8081/api/v1/addVisaCard', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Email': user.email,
+          'Password': user.Password
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          'cardNumber': formData.cardNumber,
+          'cardHolder': formData.cardHolder,
+          'expirationDate': formData.expirationDate,
+          'CVV': formData.CVV
+        })
       });
 
       if (response.ok) {
@@ -67,39 +97,24 @@ const DriverProfilePage = () => {
         console.log(result.message);
         setUser({ ...user, ...formData });
         setIsEditing(false);
+        notifySuccessVisaAdding();
       } else if (response.status === 400) {
         const error = await response.json();
+        notifyFaildVisaAdding();
         console.error('Invalid input data:', error.error);
       } else if (response.status === 401) {
         console.error('Unauthorized');
+        notifyFaildVisaAdding();
       } else {
         console.error('Failed to update user data');
+        notifyFaildVisaAdding();
       }
     } catch (error) {
       console.error('Error updating user data:', error);
+      notifyFaildVisaAdding();
     }
   };
 
-  const handleUploadPhotoOpen = () => {
-    setIsUploadPhotoOpen(true);
-  };
-
-  const handleUploadPhotoClose = () => {
-    setIsUploadPhotoOpen(false);
-  };
-
-  const handleChangePasswordOpen = () => {
-    setIsChangePasswordOpen(true);
-  };
-
-  const handleChangePasswordClose = () => {
-    setIsChangePasswordOpen(false);
-  };
-
-  const handlePhotoUpload = (newPhoto) => {
-    setProfilePhoto(newPhoto);
-    setUser({ ...user, profilePhoto: newPhoto });
-  };
 
   const handleLogout = () =>{
     navigate('/');
@@ -115,55 +130,50 @@ const DriverProfilePage = () => {
 
   return (
     <ProfileContainer>
-      <ProfileImage src={profilePhoto || unknownPhoto} alt="Profile" />
+      <ProfileImage>{user.username.charAt(0)+user.username.charAt(1)}</ProfileImage>
       {isEditing ? (
         <form onSubmit={handleSubmit}>
           <ProfileDetails>
             <ProfileInput
-              type="text"
-              name="username"
-              value={formData.username}
+              type="number"
+              name="cardNumber"
+              maxLength="16"
+              value={formData.cardNumber}
               onChange={handleInputChange}
-              placeholder="Username"
+              placeholder="Card Number"
               required
             />
-            <ProfileInput
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Email"
-              required
-            />
-            <ProfileSelect
-              name="gender"
-              value={formData.gender}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select Gender</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-              <option value="UNKNOWN">Prefer not to say</option>
-            </ProfileSelect>
+            {errors.cardNumber && <small style={{color:"red"}}>{errors.cardNumber}</small>}
             <ProfileInput
               type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              name="cardHolder"
+              value={formData.cardHolder}
               onChange={handleInputChange}
-              placeholder="Phone Number"
+              placeholder="Card Holder"
+              required
             />
+            {errors.cardHolder && <small style={{color:"red"}}>{errors.cardHolder}</small>}
+            <ProfileInput
+              type="text"
+              name="expirationDate"
+              value={formData.expirationDate}
+              onChange={handleInputChange}
+              placeholder="Expiration Date MM/YY"
+            />
+            {errors.expirationDate && <small style={{color:"red"}}>{errors.expirationDate}</small>}
+            <ProfileInput
+              type="number"
+              name="CVV"
+              maxLength="3"
+              value={formData.CVV}
+              onChange={handleInputChange}
+              placeholder="CVV"
+            />
+            {errors.CVV && <small style={{color:"red"}}>{errors.CVV}</small>}
             <ButtonContainer>
               <ProfileButton type="submit">Save</ProfileButton>
               <ProfileButton type="button" onClick={handleCancelClick}>
                 Cancel
-              </ProfileButton>
-              {/* <ProfileButton type="button" onClick={handleUploadPhotoOpen}>
-                <img src={edit} style={{scale:"0.6"}}/>
-              </ProfileButton> */}
-              <img src={edit} style={{width: "2rem", height: "2rem", cursor: "pointer", transform: "translate(200%, -850%)", margin: "0"}} onClick={handleUploadPhotoOpen}/>
-              <ProfileButton type="button" onClick={handleChangePasswordOpen}>
-                Change Password
               </ProfileButton>
             </ButtonContainer>
           </ProfileDetails>
@@ -172,17 +182,30 @@ const DriverProfilePage = () => {
         <ProfileDetails>
           <ProfileName>{user.username}</ProfileName>
           <ProfileInfo>Email: {user.email}</ProfileInfo>
-          <ProfileInfo>Gender: {user.gender}</ProfileInfo>
-          <ProfileInfo>Phone Number: {user.phoneNumber}</ProfileInfo>
-          <ProfileButton onClick={handleEditClick}>Edit Profile</ProfileButton>
+          <ProfileInfo>Phone Number: {user.phone}</ProfileInfo>
+          <ProfileInfo>Car Plat Number: {user.carID}</ProfileInfo>
+          <CardInfo>
+            <div style={{display: "flex", color: '#ADEFD1FF'}}>
+              <div style={{textAlign: "start"}}>
+              <FieldTitle>Card Number</FieldTitle> 
+              <FieldValue>{user.visaCard.cardNumber ? user.visaCard.cardNumber.slice(0, 4)+"   "+user.visaCard.cardNumber.slice(4, 8)+"   "+user.visaCard.cardNumber.slice(8, 12) + "   " + user.visaCard.cardNumber.slice(12, 16):"_"}</FieldValue>
+            </div></div>
+            <div style={{display: "flex", color: '#ADEFD1FF'}}>
+              <div style={{marginRight: "1rem"}}>
+                <FieldTitle>MM/YY</FieldTitle>
+                <FieldValue>{user.visaCard.expirationDate?user.visaCard.expirationDate:"_"}</FieldValue>
+              </div>
+              <div>
+                <FieldTitle>CVV</FieldTitle>
+                <FieldValue>{user.visaCard.CVV?user.visaCard.CVV:"_"}</FieldValue>
+              </div>
+            </div>
+            <FieldValue>{user.visaCard.cardHolder?user.visaCard.cardHolder:""}</FieldValue>
+
+          </CardInfo>
+          <ProfileButton onClick={handleEditClick}>Edit VISA Card</ProfileButton>
           <ProfileButton onClick={handleLogout}>Log out</ProfileButton>
         </ProfileDetails>
-      )}
-      {isUploadPhotoOpen && (
-        <UploadPhoto onClose={handleUploadPhotoClose} onUpload={handlePhotoUpload} />
-      )}
-      {isChangePasswordOpen && (
-        <ChangePassword onClose={handleChangePasswordClose} />
       )}
     </ProfileContainer>
   );
@@ -205,17 +228,44 @@ const ProfileContainer = styled.div`
 
 `;
 
-const ProfileImage = styled.img`
+const ProfileImage = styled.div`
   width: 150px;
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 20px;
+  font-size: 4rem;
+  color: #ADEFD1FF;
+  background-color: #00203FFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
+const CardInfo = styled.div`
+  text-align: start-line;
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 0.5rem;
+  color: #ADEFD1FF;
+  background-color: black;
+  width: 100%;
+`;
 const ProfileDetails = styled.div`
   text-align: center;
   
+`;
+
+const FieldTitle = styled.div`
+  margin: 0;
+  font-size: 1rem;
+`;
+
+const FieldValue = styled.p`
+  font-size: 16px;
+  margin: 5px 0;
+  color: #ADEFD1FF;
+  font-family: Arial, Helvetica, sans-serif;
 `;
 
 const ProfileName = styled.h1`
@@ -225,21 +275,12 @@ const ProfileName = styled.h1`
 
 const ProfileInfo = styled.p`
   font-size: 16px;
-  color: #555;
   margin: 5px 0;
   color: #00203FFF;
 
 `;
 
 const ProfileInput = styled.input`
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-`;
-
-const ProfileSelect = styled.select`
   width: 100%;
   padding: 10px;
   margin: 10px 0;

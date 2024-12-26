@@ -13,13 +13,13 @@ const ChangePassword = ({ onClose }) => {
   };
 
   const handleChangePassword = async () => {
-    const token = localStorage.getItem('drip_me_up_jwt');
+    const token = localStorage.getItem('go_park_jwt');
     try {
-      const response = await fetch('http://localhost:8081/users/', {
+      const response = await fetch('http://localhost:8081/api/v1/users/changePassword', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': token
         },
         body: JSON.stringify(formData)
       });

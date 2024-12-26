@@ -50,7 +50,7 @@ html, body{
     width: 3rem;
 }
 
-input[type="text"], input[type="password"], input[type="number"], input[type="email"], .formBox select, .phoneInput input{
+input[type="text"], input[type="password"], input[type="number"], input[type="email"], input[type="date"], .formBox select, .phoneInput input{
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -371,3 +371,56 @@ center{
     background-color: #ADEFD1FF;
 }
 
+.parkCard{
+    margin: 0.5rem;
+    background-color: #ADEFD1FF;
+    color: #00203FFF;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.parkCard p{
+    margin: 0;
+    font-size: 1.5rem;
+}
+.parkCard:hover{
+    color: #ADEFD1FF;
+    background-color: #00203FFF;
+}
+
+.navigationBar{
+    background-color: #0A9396;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.closeButton{
+    transform: translate(1000%, 0%);
+    width: fit-content;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 3rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    background-color: white;
+    color: #00203FFF;
+    text-decoration: none;
+}
+
+.closeButton:hover{
+    color: white;
+    background-color: black;
+    
+}
+
+
+.navBarButton:hover{
+    scale: 1.2;
+}
