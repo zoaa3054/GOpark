@@ -7,8 +7,12 @@ import Modal from 'react-modal';
 const libraries = ['places'];
 const MainPage = () => {
     const location = useLocation();
-    // const { user } = location.state || {username: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
-    const user = {username: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
+    const { user } = location.state || {'driverUserName': "",
+                'emailAddress': "",
+                'password': "",
+                'phoneNumber': "",
+                'carPlateNumber': ''};
+    // const user = {username: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: "AIzaSyAIdfL3_H7BT6e2MNzGbMGM476QlijvZHs", // Replace with your API Key
         libraries

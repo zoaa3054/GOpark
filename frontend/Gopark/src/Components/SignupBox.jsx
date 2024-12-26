@@ -12,10 +12,8 @@ const SignupBox = () =>{
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confermPassword, setConfermPassword] = useState("");
-    // const [country, setCountry] = useState("+20");
     const [phone, setPhone] = useState("");
-    // const [city, setCity] = useState("");
-    // const [address, setAddress] = useState("");
+    const [carID, setCarID] = useState("");
     const [gender, setGender] = useState("UNKNOWN");
     const [errorMessage, setErrorMessage] = useState('');
     const [errorTrigger, setErrorTrigger] = useState('');
@@ -76,28 +74,22 @@ const SignupBox = () =>{
     }
 
     const signup = async ()=>{
-        const register = await fetch(`http://localhost:8081/api/v1/users/signup`,{
+        const register = await fetch(`http://localhost:8081/users/signUp`,{
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password,
-                phone: phone,
-                carID: '',
-                visaCard: 
-                    {
-                        cardNumber: '',
-                        cardHolder: '',
-                        expirationDate: '',
-                        CVV:''
-                    }
+                'driverUserName': username,
+                'emailAddress': email,
+                'password': password,
+                'phoneNumber': phone,
+                'carPlateNumber': carID
             })
          })
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((userData)=>{
+            console.log(userData);
             navigate('/main', {state:{user: userData}});
         })
         .catch(error=>{
@@ -144,6 +136,8 @@ const SignupBox = () =>{
                         <></> :
                         <p style={{color: 'red', fontSize:'1rem'}}>Conferm password doesn't match the enterd password</p>
                     }
+                    <label htmlFor="carID"><b>Car plat number</b></label>
+                    <input type="text" name='carID' placeholder="Car plat number" value={carID} onChange={(e)=>setCarID(e.target.value)} required></input>
                     <label htmlFor="phone"><b>Phone</b></label>
                     <PhoneInput className="phoneInput" international placeholder="Enter phone number" value={phone} onChange={setPhone} isValidPhoneNumber required/>
                     {errorTrigger == "phoneError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>}

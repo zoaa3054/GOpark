@@ -13,7 +13,7 @@ const LoginBox = () =>{
 
     const login = async (e)=>{
         e.preventDefault()
-        const userFetched = await fetch(`http://localhost:8081/api/v1/users/login`,{
+        const userFetched = await fetch(`http://localhost:8081/users/login`,{
             method: "GET",
             headers: {
                 'Email': email,

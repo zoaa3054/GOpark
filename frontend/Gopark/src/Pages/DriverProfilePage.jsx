@@ -10,23 +10,35 @@ import { toast } from 'react-toastify';
 
 const DriverProfilePage = () => {
   const location = useLocation();
-  const { userLoaded } = location.state || {username: "", password: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
+  const { userLoaded } = location.state || {'driverUserName': "",
+                'emailAddress': "",
+                'password': "",
+                'phoneNumber': "",
+                'carPlateNumber': ''};
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    phone: ''
-  });
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   useEffect(() => {
-    setUser(userLoaded);
+    setUser({
+      username: userLoaded.driverUserName,
+      email: userLoaded.emailAddress,
+      phone: userLoaded.phoneNumber,
+      carID: userLoaded.carPlateNumber,
+      password: userLoaded.password,
+      visaCard:{
+        cardNumber: "",
+        cardHolder: "", 
+        expirationDate: "", 
+        CCV: ""
+      }
+    });
     setFormData({
-      cardNumber: userLoaded.visaCard.cardNumber, 
-      cardHolder: userLoaded.visaCard.cardHolder, 
-      expirationDate: userLoaded.visaCard.expirationDate, 
-      CVV: userLoaded.visaCard.CCV
+      cardNumber: "", 
+      cardHolder: "", 
+      expirationDate: "", 
+      CVV: ""
     });
   }, []);
 

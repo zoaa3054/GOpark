@@ -19,7 +19,7 @@ public class DriverController {
     }
 
     @GetMapping("/login")
-    public Driver addNeWDriver(@RequestParam String emailAddress, @RequestParam String password) throws RuntimeException{
+    public Driver addNeWDriver(@RequestHeader("Email") String emailAddress, @RequestHeader("Password") String password) throws RuntimeException{
         return driverService.getDriver(emailAddress, password);
     }
 }
