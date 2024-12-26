@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/manager")
+@RequestMapping("/lot/admins")
 public class ManagerController {
 
     @Autowired
@@ -17,5 +17,10 @@ public class ManagerController {
     @PostMapping("/signUp")
     public Manager addNeWManager(@RequestBody Manager manager) {
         return managerService.addnewManager(manager);
+    }
+
+    @GetMapping("/login")
+    public Manager getManager(@RequestHeader("Email") String emailAddress, @RequestHeader("Password") String password) {
+        return managerService.getManager(emailAddress, password);
     }
 }
