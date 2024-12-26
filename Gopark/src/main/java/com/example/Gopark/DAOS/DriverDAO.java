@@ -15,7 +15,7 @@ public class DriverDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Driver insertDriver(Driver driver) {
+    public Driver insertDriver(Driver driver) throws RuntimeException{
         String sql = "INSERT INTO DRIVER (driver_username, password, email, phone, car_plate) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try {

@@ -8,18 +8,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/driver")
+@RequestMapping("/users")
 public class DriverController {
     @Autowired
     DriverService driverService;
 
     @PostMapping("/signUp")
-    public Driver addNeWDriver(@RequestBody Driver driver) {
+    public Driver addNeWDriver(@RequestBody Driver driver) throws RuntimeException{
         return driverService.addnewDriver(driver);
     }
 
     @GetMapping("/login")
-    public Driver addNeWDriver(@RequestParam String emailAddress, @RequestParam String password) {
+    public Driver addNeWDriver(@RequestParam String emailAddress, @RequestParam String password) throws RuntimeException{
         return driverService.getDriver(emailAddress, password);
     }
 }
