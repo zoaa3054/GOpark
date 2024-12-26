@@ -88,6 +88,9 @@ const SystemAdminMainPage = () =>{
         .catch(e=>{console.error(e); notifyFaildDeleting();});
     }
 
+    const generateReport = async(lot)=>{
+
+    }
     const hideLot = () =>{
         setShowLotSwitchAnimation(false); setTimeout(()=>{setShowLotSwitch(false)}, 500);
     }
@@ -167,6 +170,8 @@ const SystemAdminMainPage = () =>{
                 >
                 <button className="backButton" onClick={hideLot}>X</button>
                 <ParkBox lot={selectedLot} person="admin"/>
+                <center><button className="backButton" onClick={()=>generateReport(selectedLot)}>Generate Report</button></center>
+
             </Modal>
             <Modal 
                 isOpen={showAddAdminBoxSwitch} 

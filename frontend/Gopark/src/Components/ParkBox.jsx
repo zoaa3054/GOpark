@@ -17,6 +17,7 @@ const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
     const [isHoverd, setIsHoverd] = useState(false);
     const [hoverdObj, setHoverdObj] = useState(NaN);
     const [showOriginInput, setShowOriginInput] = useState(false);
+    const [showReservationForm, setShowReservationForm] = useState(false);
     const [counter, setCounter] = useState(0);
     const origin = useRef();
     const targetRef = useRef(null);
@@ -99,12 +100,21 @@ const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
                     )}
                 </div>
             </div>
-            {person == "user" && <center><button className='backButton' onClick={()=>{setShowOriginInput(true); setTimeout(()=>{handleScroll()}, 100)}}>Get directions</button></center>}
+            {person == "user" && <div style={{display:"flex", justifyContent:"center", alignItems:"center"}}>
+                <button className='backButton' onClick={()=>{setShowOriginInput(true); setTimeout(()=>{handleScroll()}, 100)}}>Get directions</button>
+                <button className='backButton' onClick={()=>{setShowReservationForm(true); setTimeout(()=>{handleScroll()}, 100)}}>Reserve</button>
+                </div>}
             {showOriginInput && <center style={{display:"flex", justifyContent:"center"}}><Autocomplete options={{componentRestrictions: { country: "br" }}}>
                                             <input type="text" placeholder="Origin"  ref={origin}/>
                                         </Autocomplete>
                                         <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, lot.locationCoor)}>Go</button>
                                         </center>}
+            {showReservationForm && <center style={{display:"flex", justifyContent:"center"}}><Autocomplete options={{componentRestrictions: { country: "br" }}}>
+                                            <input type="text" placeholder="Origin"  ref={origin}/>
+                                        </Autocomplete>
+                                        <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, lot.locationCoor)}>Go</button>
+                                        </center>}
+
             {person == "admin" && 
             <div className='analysisArea'>
                 <hr style={{color:"black"}}/>

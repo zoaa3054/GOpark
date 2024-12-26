@@ -51,6 +51,10 @@ const ParkAdminMainPage = () =>{
         .catch(e=>console.error(e));
     }
 
+    const generateReport = async()=>{
+        
+    }
+
     const reserveAll = ()=>{
         if (spots.length == 0) return;
         for(let spot in spots){
@@ -75,6 +79,7 @@ const ParkAdminMainPage = () =>{
         <div style={{display:"flex", justifyContent:"center"}}>
             <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>setIsEditing(true)}>Edit</button>
             <button className="backButton" onClick={reserveAll}>Reserve All</button>
+            <button className="backButton" onClick={generateReport}>Generate Report</button>
         </div></>
         }
         {isEditing && <div style={{margin:"1rem"}}>

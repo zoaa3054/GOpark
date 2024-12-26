@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../style.css';
 import 'react-phone-number-input/style.css'
 import PhoneInput, {isValidPhoneNumber} from 'react-phone-number-input'
-import countryNames from 'react-phone-number-input/locale/en'
 import emailjs from 'emailjs-com';
 
 
