@@ -25,7 +25,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const [hoverdObj, setHoverdObj] = useState(NaN);
     const [showOriginInput, setShowOriginInput] = useState(false);
     const [showReservationForm, setShowReservationForm] = useState(false);
-    const [spotsReservations, setSpotsReservations] = useState([]);
+    const [spotsReservations, setSpotsReservations] = useState([{}]);
     const [fromTime, setFromTime] = useState('');
     const [toTime, setToTime] = useState('');
     const [fromDay, setFromDay] = useState('');
@@ -73,7 +73,6 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
         .then(response=>response.status==200 || response.status==201?(()=>{return response.json()})(): (()=>{throw Error("Error fetching reservations")})())
         .then(reservationsData=>{
             setSpotsReservations(reservationsData);
-            console.log("reservations: ", reservationsData);
         })
         .catch(e=>console.error(e));
     }
@@ -100,18 +99,24 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
         let spotsByGivenType = getSpotsByType(type);
         let violatedFlag = false;
         for (let i=0; i<spotsByGivenType.length; i++){
-            if (spotsReservations.length == 0) {availableSpot = spotsByGivenType[i];}
+            violatedFlag = false;
+            if (spotsReservations.length == 0) availableSpot = spotsByGivenType[i];
             for (let j=0; j<spotsReservations.length; j++){
                 if (spotsByGivenType[i].number == spotsReservations[j].spotNumber 
-                    && ((startTimeAsTimeStamp < new Date(spotsReservations[j].startTime).getTime()+7_200_000 && endTimeAsTimeStamp <= new Date(spotsReservations[j].startTime).getTime()+7_200_000)
-                    ||(startTimeAsTimeStamp >= new Date(spotsReservations[j].endTime).getTime()+7_200_000 && endTimeAsTimeStamp > new Date(spotsReservations[j].endTime).getTime()+7_200_000))){
+                    && ((startTimeAsTimeStamp < new Date(spotsReservations[j].startTime).getTime() && endTimeAsTimeStamp <= new Date(spotsReservations[j].startTime).getTime())
+                    ||(startTimeAsTimeStamp >= new Date(spotsReservations[j].endTime).getTime() && endTimeAsTimeStamp > new Date(spotsReservations[j].endTime).getTime()))){
                     availableSpot = spotsByGivenType[i];
-                }else{
+                }
+                else if (spotsByGivenType[i].number != spotsReservations[j].spotNumber){
+                    availableSpot = spotsByGivenType[i];
+                }
+                else{
                     violatedFlag = true;
+                    availableSpot = null;
                     break;
                 }
             }
-            if (violatedFlag) break
+            if (!violatedFlag) break;
         }
         if (!violatedFlag){
             const confermation = window.confirm(`You are now about to reserve spot number: ${availableSpot.number} in ${lot.name} lot\nPress confirm to conferm your reservation.`);

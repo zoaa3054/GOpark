@@ -31,7 +31,7 @@ public class ParkingLotDAO {
             parkingLot.setManagerId(rs.getLong("manager_Id"));
             parkingLot.setOccupiedSpots(rs.getInt("occupied_Spots"));
             parkingLot.setTotalSpots(rs.getInt("total_Spots"));
-            parkingLot.setCurrentPrice(rs.getFloat("current_Price"));
+            parkingLot.setCurrentPrice(rs.getFloat("currend_Price"));
             return parkingLot;
         });
     }
@@ -87,11 +87,11 @@ public class ParkingLotDAO {
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Violation violation = new Violation();
-            violation.setId(rs.getLong("id"));
+            violation.setId((int)rs.getLong("id"));
             violation.setType(rs.getString("type"));
             violation.setPenalty(rs.getFloat("penalty"));
             violation.setPaid(rs.getBoolean("paid"));
-            violation.setReservationId(rs.getLong("reservation_id"));
+            violation.setReservationId((int)rs.getLong("reservation_id"));
             return violation;
         }, managerId);
     }

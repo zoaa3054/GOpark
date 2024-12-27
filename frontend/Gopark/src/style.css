@@ -381,6 +381,24 @@ center{
     background-color: #ADEFD1FF;
 }
 
+
+.notificationsIcon{
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid transparent
+}
+
+.notificationsIcon:hover{
+    border: 1px solid black;
+    border-radius: 50%;
+}
+
+.notificationsIcon:active{
+    background-color: #ADEFD1FF;
+}
+
 .parkCard{
     margin: 0.5rem;
     background-color: #ADEFD1FF;
@@ -433,4 +451,20 @@ center{
 
 .navBarButton:hover{
     scale: 1.2;
+}
+
+.notificationsBox{
+    background-color: rgb(225, 246, 236);
+    position: absolute;
+}
+
+.notificationCard{
+    margin: 0.5rem;
+    background-color: #ADEFD1FF;
+    color: #00203FFF;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 20px;
+    display: grid;
+    justify-content: space-between;
 }

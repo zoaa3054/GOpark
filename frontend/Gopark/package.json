@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
+    "@stomp/stompjs": "^7.0.0",
     "buffer": "^6.0.3",
+    "global": "^4.4.0",
     "gopark": "file:",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
@@ -20,6 +22,7 @@
     "react-modal": "^3.16.3",
     "react-phone-number-input": "^3.4.10",
     "react-toastify": "^11.0.2",
+    "sockjs-client": "^1.6.1",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

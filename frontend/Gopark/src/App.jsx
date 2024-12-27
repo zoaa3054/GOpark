@@ -12,9 +12,10 @@ import DriverProfilePage from './Pages/DriverProfilePage';
 import WelcomePage from './Pages/WelcomePage';
 import LoginPage from './Pages/LoginPage';
 import { ToastContainer } from 'react-toastify';
+import Modal from 'react-modal';
+Modal.setAppElement("#root");
 
 function App() {
-  
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>

@@ -98,7 +98,7 @@ const SignupBox = () =>{
     }
     
     return(
-        <div className="formBox">
+        <div className="formBox" style={{marginTop:"10rem", marginBottom:"22rem"}}>
             {phase==1 &&(
                 <form id="signupForm" onSubmit={sendCode}>
                     <header>Signup</header>
