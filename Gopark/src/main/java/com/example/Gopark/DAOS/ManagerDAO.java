@@ -26,7 +26,7 @@ public class ManagerDAO {
                     manager.getEmailAddress());
 
             if (rowsAffected > 0) {
-                return manager;
+                return login(manager.getEmailAddress(), manager.getPassword());
             } else {
                 throw new RuntimeException("Failed to insert manager: No rows affected");
             }

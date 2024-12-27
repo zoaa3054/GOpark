@@ -49,7 +49,7 @@ public class DriverDAO {
                     driver.getCarPlateNumber());
 
             if (rowsAffected > 0) {
-                return driver;
+                return login(driver.getEmailAddress(), driver.getPassword());
             } else {
                 throw new RuntimeException("Failed to insert driver: No rows affected");
             }
