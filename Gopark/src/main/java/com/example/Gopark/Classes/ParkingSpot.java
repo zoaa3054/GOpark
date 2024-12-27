@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class ParkingSpot {
-
     private int parkingLotId;
     private int number;
     private String type;
