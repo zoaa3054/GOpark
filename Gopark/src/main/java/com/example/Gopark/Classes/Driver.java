@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class Driver {
-    int id;
-    String driverUserName;
-    String password;
-    String emailAddress;
-    String phoneNumber;
-    String carPlateNumber;
+    private Long id;
+    private String driver_username;
+    private String password;
+    private String email;
+    private String phone;
+    private String car_Plate;
 }

@@ -1,5 +1,10 @@
 package com.example.Gopark.DAOS;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class ParkingSpotDAO {
+
 import com.example.Gopark.Classes.Driver;
 import com.example.Gopark.Classes.ParkingSpot;
 import com.example.Gopark.Classes.Reservation;

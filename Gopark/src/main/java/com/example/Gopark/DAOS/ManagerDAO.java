@@ -1,5 +1,6 @@
 package com.example.Gopark.DAOS;
 
+
 import com.example.Gopark.Classes.Driver;
 import com.example.Gopark.Classes.Manager;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -7,8 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ManagerDAO {
-    private final JdbcTemplate jdbcTemplate;
 
+    private final JdbcTemplate jdbcTemplate;
+    
     public ManagerDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
