@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class ParkingSimulator {
                         String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
                         // Execute the insert
                         jdbcTemplate.update(insertQuery,
-                                "non-use",
+                                "nonuse",
                                 (double) (minutes * 0.2),
                                 false,
                                 reservation.getId()
@@ -67,7 +68,7 @@ public class ParkingSimulator {
 
 
             // Query to retrieve reservations where arrival is not null, departure is null, and end_time has passed
-            String departedReservationQuery = "SELECT * FROM reservation WHERE arrival IS NOT NULL AND departure IS NULL AND end_time <= ?";
+            String departedReservationQuery = "SELECT * FROM reservation WHERE departure IS NULL AND end_time <= ?";
             List<Reservation> departedReservations = jdbcTemplate.query(departedReservationQuery, new Object[]{Timestamp.from(Instant.now())}, (rs, rowNum) -> {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
@@ -83,31 +84,70 @@ public class ParkingSimulator {
             });
 
             for (Reservation reservation : departedReservations) {
-                boolean updateOrNot = (Math.random() > 0.2);
-                if(updateOrNot) {
-                    // Update the departure time to the current timestamp
+                if(reservation.getArrival() == null) {
                     Timestamp currentTimestamp = Timestamp.from(Instant.now());
-                    long differenceInMillis = currentTimestamp.getTime() - reservation.getEndTime().getTime();
                     String updateDepartureQuery = "UPDATE reservation SET departure = ? WHERE id = ?";
                     jdbcTemplate.update(updateDepartureQuery, currentTimestamp, reservation.getId());
+                    String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
+                    long minutes = (reservation.getEndTime().getTime() - reservation.getStartTime().getTime()) / (1000 * 60);
+                    // Execute the insert
+                    jdbcTemplate.update(insertQuery,
+                            "nonuse",
+                            (double) (minutes * 0.2),
+                            false,
+                            reservation.getId()
+                    );
+                }
+                else {
+                    boolean updateOrNot = (Math.random() > 0.2);
+                    if(updateOrNot) {
+                        // Update the departure time to the current timestamp
+                        Timestamp currentTimestamp = Timestamp.from(Instant.now());
+                        long differenceInMillis = currentTimestamp.getTime() - reservation.getEndTime().getTime();
+                        String updateDepartureQuery = "UPDATE reservation SET departure = ? WHERE id = ?";
+                        jdbcTemplate.update(updateDepartureQuery, currentTimestamp, reservation.getId());
 
-                    // Update the parking spot state to 'Available'
-                    String updateParkingSpotQuery = "UPDATE parking_spot SET state = 'Available' WHERE parking_lot_id = ? AND number = ?";
-                    jdbcTemplate.update(updateParkingSpotQuery, reservation.getLotId(), reservation.getSpotNumber());
+                        // Update the parking spot state to 'Available'
+                        String updateParkingSpotQuery = "UPDATE parking_spot SET state = 'Available' WHERE parking_lot_id = ? AND number = ?";
+                        jdbcTemplate.update(updateParkingSpotQuery, reservation.getLotId(), reservation.getSpotNumber());
 
-                    long minutes = differenceInMillis / (1000 * 60);
-                    System.out.println(differenceInMillis + " " + minutes);
-                    if(minutes >= 0) {
-                        String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
-                        // Execute the insert
-                        jdbcTemplate.update(insertQuery,
-                                "overuse",
-                                (double) (minutes * 0.2),
-                                false,
-                                reservation.getId()
-                        );
+                        long minutes = differenceInMillis / (1000 * 60);
+                        System.out.println(differenceInMillis + " " + minutes);
+                        if(minutes >= 0) {
+                            String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
+                            // Execute the insert
+                            jdbcTemplate.update(insertQuery,
+                                    "overuse",
+                                    (double) (minutes * 0.2),
+                                    false,
+                                    reservation.getId()
+                            );
+                        }
                     }
                 }
+            }
+
+
+            reservationQuery = "SELECT * FROM reservation WHERE end_time BETWEEN ? AND ?";
+            List<Reservation> endingSoonReservations = jdbcTemplate.query(reservationQuery, new Object[]{
+                    Timestamp.from(Instant.now()),
+                    Timestamp.from(Instant.now().plus(Duration.ofMinutes(5)))
+            }, (rs, rowNum) -> {
+                Reservation reservation = new Reservation();
+                reservation.setId(rs.getInt("id"));
+                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setLotId(rs.getInt("lot_id"));
+                reservation.setSpotNumber(rs.getInt("spot_number"));
+                reservation.setStartTime(rs.getTimestamp("start_time"));
+                reservation.setEndTime(rs.getTimestamp("end_time"));
+                reservation.setArrival(rs.getTimestamp("arrival"));
+                reservation.setDeparture(rs.getTimestamp("departure"));
+                reservation.setCost(rs.getDouble("cost"));
+                return reservation;
+            });
+
+            for(Reservation reservation : endingSoonReservations) {
+                // todo: sending notifications by driver id
             }
 
         } catch (Exception e) {
