@@ -35,7 +35,7 @@ public class ParkingSimulator {
                 reservation.setCost(rs.getDouble("cost"));
                 return reservation;
             });
-            System.out.println(activeReservations.size());
+//            System.out.println(activeReservations.size());
             for (Reservation reservation : activeReservations) {
                 boolean updateOrNot = (Math.random() > 0.5);
                 if(updateOrNot) {
@@ -51,7 +51,8 @@ public class ParkingSimulator {
                     jdbcTemplate.update(updateParkingSpotQuery, reservation.getLotId(), reservation.getSpotNumber());
 
                     long minutes = differenceInMillis / (1000 * 60);
-                    if(minutes > 1) {
+                    System.out.println(differenceInMillis + " " + minutes);
+                    if(minutes >= 1) {
                         String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
                         // Execute the insert
                         jdbcTemplate.update(insertQuery,
@@ -86,12 +87,26 @@ public class ParkingSimulator {
                 if(updateOrNot) {
                     // Update the departure time to the current timestamp
                     Timestamp currentTimestamp = Timestamp.from(Instant.now());
+                    long differenceInMillis = currentTimestamp.getTime() - reservation.getEndTime().getTime();
                     String updateDepartureQuery = "UPDATE reservation SET deprature = ? WHERE id = ?";
                     jdbcTemplate.update(updateDepartureQuery, currentTimestamp, reservation.getId());
 
                     // Update the parking spot state to 'Available'
                     String updateParkingSpotQuery = "UPDATE parking_spot SET state = 'Available' WHERE parking_lot_id = ? AND number = ?";
                     jdbcTemplate.update(updateParkingSpotQuery, reservation.getLotId(), reservation.getSpotNumber());
+
+                    long minutes = differenceInMillis / (1000 * 60);
+                    System.out.println(differenceInMillis + " " + minutes);
+                    if(minutes >= 0) {
+                        String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
+                        // Execute the insert
+                        jdbcTemplate.update(insertQuery,
+                                "overuse",
+                                (double) (minutes * 0.2),
+                                false,
+                                reservation.getId()
+                        );
+                    }
                 }
             }
 
