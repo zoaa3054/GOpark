@@ -1,10 +1,5 @@
 package com.example.Gopark.DAOS;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
-public class ParkingSpotDAO {
-
 import com.example.Gopark.Classes.Driver;
 import com.example.Gopark.Classes.ParkingSpot;
 import com.example.Gopark.Classes.Reservation;
@@ -15,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+
+
 
 @Repository
 public class ParkingSpotDAO {

@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class Driver {
     private Long id;
-    private String driver_username;
+    private String driverUserName;
     private String password;
-    private String email;
-    private String phone;
-    private String car_Plate;
+    private String emailAddress;
+    private String phoneNumber;
+    private String carPlateNumber;
 }

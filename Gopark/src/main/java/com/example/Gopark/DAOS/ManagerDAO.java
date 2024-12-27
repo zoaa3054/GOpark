@@ -40,7 +40,7 @@ public class ManagerDAO {
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
                 Manager manager = new Manager();
-                manager.setId(rs.getInt("id"));
+                manager.setId(rs.getLong("id"));
                 manager.setUserName(rs.getString("username"));
                 manager.setPassword(rs.getString("password"));
                 manager.setEmailAddress(rs.getString("email"));

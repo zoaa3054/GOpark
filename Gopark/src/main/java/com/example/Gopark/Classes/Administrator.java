@@ -6,7 +6,7 @@ import lombok.Data;
 public class Administrator {
 
     private Long id;
-    private String username;
+    private String userName;
     private String password;
-    private String email;
+    private String emailAddress;
 }

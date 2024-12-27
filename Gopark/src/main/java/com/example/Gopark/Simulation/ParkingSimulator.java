@@ -31,7 +31,7 @@ public class ParkingSimulator {
                 reservation.setStartTime(rs.getTimestamp("start_time"));
                 reservation.setEndTime(rs.getTimestamp("end_time"));
                 reservation.setArrival(rs.getTimestamp("arrival"));
-                reservation.setDeparture(rs.getTimestamp("deprature"));
+                reservation.setDeparture(rs.getTimestamp("departure"));
                 reservation.setCost(rs.getDouble("cost"));
                 return reservation;
             });
@@ -67,7 +67,7 @@ public class ParkingSimulator {
 
 
             // Query to retrieve reservations where arrival is not null, departure is null, and end_time has passed
-            String departedReservationQuery = "SELECT * FROM reservation WHERE arrival IS NOT NULL AND deprature IS NULL AND end_time <= ?";
+            String departedReservationQuery = "SELECT * FROM reservation WHERE arrival IS NOT NULL AND departure IS NULL AND end_time <= ?";
             List<Reservation> departedReservations = jdbcTemplate.query(departedReservationQuery, new Object[]{Timestamp.from(Instant.now())}, (rs, rowNum) -> {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
@@ -77,7 +77,7 @@ public class ParkingSimulator {
                 reservation.setStartTime(rs.getTimestamp("start_time"));
                 reservation.setEndTime(rs.getTimestamp("end_time"));
                 reservation.setArrival(rs.getTimestamp("arrival"));
-                reservation.setDeparture(rs.getTimestamp("deprature"));
+                reservation.setDeparture(rs.getTimestamp("departure"));
                 reservation.setCost(rs.getDouble("cost"));
                 return reservation;
             });
@@ -88,7 +88,7 @@ public class ParkingSimulator {
                     // Update the departure time to the current timestamp
                     Timestamp currentTimestamp = Timestamp.from(Instant.now());
                     long differenceInMillis = currentTimestamp.getTime() - reservation.getEndTime().getTime();
-                    String updateDepartureQuery = "UPDATE reservation SET deprature = ? WHERE id = ?";
+                    String updateDepartureQuery = "UPDATE reservation SET departure = ? WHERE id = ?";
                     jdbcTemplate.update(updateDepartureQuery, currentTimestamp, reservation.getId());
 
                     // Update the parking spot state to 'Available'

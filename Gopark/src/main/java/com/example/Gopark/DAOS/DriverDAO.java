@@ -63,7 +63,7 @@ public class DriverDAO {
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
                 Driver driver = new Driver();
-                driver.setId(rs.getInt("id"));
+                driver.setId(rs.getLong("id"));
                 driver.setDriverUserName(rs.getString("driver_username"));
                 driver.setPassword(rs.getString("password"));
                 driver.setEmailAddress(rs.getString("email"));
