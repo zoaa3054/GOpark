@@ -1,7 +1,24 @@
 package com.example.Gopark.Controllers;
 
-import org.springframework.stereotype.Controller;
+import com.example.Gopark.Classes.NotificationMessage;
+import com.example.Gopark.Services.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.List;
+
+@RestController
 public class NotificationController {
+    @Autowired
+    private NotificationService notificationService;
+
+    @GetMapping("/driver/notification/{driverId}")
+    public List<NotificationMessage> getNotificationsByDriverID(@PathVariable Long driverId)
+    {
+        return notificationService.getAllDriverNotifications(driverId);
+    }
+
+
 }

@@ -46,7 +46,7 @@ public class ParkingLotDAO {
             spot.setType(rs.getString("type"));
             spot.setRealTimeState(rs.getString("State"));
             return spot;
-        }, id); // `id` is passed as the parameter to the query
+        }, id);
     }
 
     public List<ManagerReportData> getOccupancyRateByManagerID(Long managerId) {
