@@ -1,5 +1,7 @@
 package com.example.Gopark.DAOS;
 
+import org.springframework.stereotype.Repository;
+
 import com.example.Gopark.Classes.Reservation;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,6 +17,12 @@ public class ReservationDAO {
 
     public ReservationDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+
+    }
+
+    public long getManagerRevenues(long lotId) {
+        String sql = "SELECT SUM(cost) AS total_revenue FROM Reservation WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, lotId);
     }
 
     public void insertReservation(Reservation reservation) {

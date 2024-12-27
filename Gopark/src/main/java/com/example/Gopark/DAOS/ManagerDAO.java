@@ -1,5 +1,6 @@
 package com.example.Gopark.DAOS;
 
+
 import com.example.Gopark.Classes.Driver;
 import com.example.Gopark.Classes.Manager;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -7,8 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ManagerDAO {
-    private final JdbcTemplate jdbcTemplate;
 
+    private final JdbcTemplate jdbcTemplate;
+    
     public ManagerDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -24,7 +26,7 @@ public class ManagerDAO {
                     manager.getEmailAddress());
 
             if (rowsAffected > 0) {
-                return manager;
+                return login(manager.getEmailAddress(), manager.getPassword());
             } else {
                 throw new RuntimeException("Failed to insert manager: No rows affected");
             }
@@ -38,7 +40,7 @@ public class ManagerDAO {
         try {
             return jdbcTemplate.queryForObject(sql, new Object[] { emailAddress, password }, (rs, rowNum) -> {
                 Manager manager = new Manager();
-                manager.setId(rs.getInt("id"));
+                manager.setId(rs.getLong("id"));
                 manager.setUserName(rs.getString("username"));
                 manager.setPassword(rs.getString("password"));
                 manager.setEmailAddress(rs.getString("email"));

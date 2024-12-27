@@ -18,7 +18,7 @@ public class AdministratorDAO {
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
                 Administrator administrator = new Administrator();
-                administrator.setId(rs.getInt("id"));
+                administrator.setId(rs.getLong("id"));
                 administrator.setUserName(rs.getString("username"));
                 administrator.setPassword(rs.getString("password"));
                 administrator.setEmailAddress(rs.getString("email"));

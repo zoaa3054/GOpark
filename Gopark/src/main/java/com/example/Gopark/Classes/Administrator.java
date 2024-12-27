@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class Administrator {
-    int id;
-    String userName;
-    String password;
-    String emailAddress;
+
+    private Long id;
+    private String userName;
+    private String password;
+    private String emailAddress;
 }
