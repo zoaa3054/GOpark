@@ -3,7 +3,7 @@ import { Link, useNavigate} from 'react-router-dom';
 import '../style.css';
 
 const AdminLoginBox = () =>{
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [errorTrigger, setErrorTrigger] = useState('');
@@ -12,10 +12,10 @@ const AdminLoginBox = () =>{
 
     const login = async (e)=>{
         e.preventDefault()
-        const adminFetched = await fetch(`http://localhost:8081/api/v1/lot/admins/login`, {
+        const adminFetched = await fetch(`http://localhost:8081/lot/admins/login`, {
             method: "GET",
             headers:{
-                'UserName': username,
+                'Email': email,
                 'Password': password
             }
         })
@@ -23,10 +23,10 @@ const AdminLoginBox = () =>{
         .then((lotData)=>{
             console.log(lotData);
             setErrorMessage('');
-            navigate('/park/admin/main', {state:{lot: lotData}})
+            navigate('/park/admin/main');
          })
         .catch(error=>{
-            setErrorMessage('Wrong username or password');
+            setErrorMessage('Wrong email or password');
             setErrorTrigger('usernameError');
         });
     }
@@ -34,8 +34,8 @@ const AdminLoginBox = () =>{
         <div className="formBox">
             <form id="loginForm" onSubmit={login}>
                 <header>Park Admin Login</header>
-                <label htmlFor='username'><b>Username</b></label>
-                <input type="text" name='username' placeholder="Username" value={username} onChange={(e)=>setUsername(e.target.value)} required></input>
+                <label htmlFor='email'><b>Email</b></label>
+                <input type="email" name='email' placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} required></input>
                 <label htmlFor="password"><b>Password</b></label>
                 <input type="password" name='password' placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required></input>
                 {errorTrigger == "usernameError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>}

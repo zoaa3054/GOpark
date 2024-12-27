@@ -23,4 +23,10 @@ public class ReservationController {
     public List<Reservation> getActiveReservationsBySpot(@RequestParam int parkID, @RequestParam int spotNumber) {
         return reservationService.getReservationsBySpot(parkID, spotNumber);
     }
+
+    @GetMapping("/getActiveReservationByLot")
+    public List<Reservation> getActiveReservationByLot(@RequestParam int parkID) {
+
+        return reservationService.getReservationsByLot(parkID);
+    }
 }

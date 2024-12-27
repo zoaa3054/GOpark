@@ -12,7 +12,6 @@ const MainPage = () => {
                 'password': "",
                 'phoneNumber': "",
                 'carPlateNumber': ''};
-    // const user = {username: "", email: "", phone: "", carID: "", visaCard: {cardNumber:"", cardHolder: "", expirationDate: "", CVV:""}};
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: "AIzaSyAIdfL3_H7BT6e2MNzGbMGM476QlijvZHs", // Replace with your API Key
         libraries
@@ -24,24 +23,23 @@ const MainPage = () => {
     const [directions, setDirections] = useState(null);
     const [distance, setDistance] = useState('');
     const [duration, setDuration] = useState('');
-    // const [parksLoaded, setParksLoaded] = useState([{ID: "", locationCoor: {lat: 0, lng:0}, name:"", capacity:"", type:"", pricingStruct:""}]);
-    const [parksLoaded, setParksLoaded] = useState([{ID: 0, locationCoor: {lat: -3.745, lng: -38.523}, name: "Layla", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+    const [parksLoaded, setParksLoaded] = useState([{id: 0, location: {lat: -3.745, lng: -38.523}, name: "Layla", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         },
-        {ID: 1, locationCoor: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        {id: 1, location: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", totalSpots: 4, 
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         },
-        {ID: 2, locationCoor: {lat: -3.6792203336730043, lng: -40.35222363281251},  name: "Samia", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        {id: 2, location: {lat: -3.6792203336730043, lng: -40.35222363281251},  name: "Samia", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         },
-        {ID: 3, locationCoor: {lat: -5, lng: -38.523},  name: "Walaa", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        {id: 3, location: {lat: -5, lng: -38.523},  name: "Walaa", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         },
-        {ID: 4, locationCoor: {lat: -6.745, lng: -38.523},  name: "Hanaa", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        {id: 4, location: {lat: -6.745, lng: -38.523},  name: "Hanaa", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         },
-        {ID: 5, locationCoor: {lat: -7.745, lng: -38.523},  name: "Safaa", capacity: 4, type: 'RETULAR', 
-        pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        {id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
         }]);
     const [center, setCenter] = useState(null);
     const destination = useRef();
@@ -55,16 +53,16 @@ const MainPage = () => {
       }
 
       loadParks();
-      console.log(parksLoaded);
-      if (center === null) setCenter(parksLoaded[0].locationCoor);
+      console.log("Parking lots:",parksLoaded);
+      if (center === null) setCenter(parksLoaded[0].location);
     }, [isLoaded]);
 
     // loading parks API
     const loadParks = async ()=>{
-      await fetch(`http://localhost:8081/api/v1/users/getLots`)
+      await fetch(`http://localhost:8081/getLots`)
       .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
       .then((parksData)=>{
-          setParksLoaded(parksData);
+        //   setParksLoaded(parksData);
       })
       .catch(e=>console.log(e));
     }
@@ -74,7 +72,7 @@ const MainPage = () => {
         setShowParkSwitchAnimation(()=>true);      
         setPark(()=>p);
         setShowParkSwitch(()=>true);
-        setCenter(()=>p.locationCoor);
+        setCenter(()=>p.location);
     }
 
     const getCoorOfPlace = async (placeName) => {
@@ -147,7 +145,7 @@ const MainPage = () => {
             parksLoaded.map((p, i) => (
                 <Marker 
                     key={i} 
-                    position={p.locationCoor} 
+                    position={p.location} 
                     clusterer={clusterer} 
                     label={{
                         text: `P${i}`,

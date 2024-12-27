@@ -16,6 +16,7 @@ public class ManagerController {
     ManagerService managerService;
     @PostMapping("/signUp")
     public Manager addNeWManager(@RequestBody Manager manager) {
+        System.out.println(manager.toString());
         return managerService.addnewManager(manager);
     }
 

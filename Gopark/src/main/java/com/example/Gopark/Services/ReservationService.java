@@ -19,4 +19,8 @@ public class ReservationService {
     public List<Reservation> getReservationsBySpot(int parkingLotId, int spotNumber) {
         return reservationDAO.getActiveReservationsForSpot(parkingLotId, spotNumber);
     }
+
+    public List<Reservation> getReservationsByLot(int parkID) {
+        return reservationDAO.getActiveReservationsForLot(parkID);
+    }
 }

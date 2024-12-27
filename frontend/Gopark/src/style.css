@@ -61,6 +61,16 @@ input[type="text"], input[type="password"], input[type="number"], input[type="em
     background-color: aliceblue;
 }
 
+input[type="time"], select{
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    box-sizing: border-box;
+    background-color: aliceblue;
+}
+
 .phoneInput img{
     height: inherit;
     width: inherit;

@@ -17,18 +17,18 @@ public class ParkingLotDAO {
     }
 
     public List<ParkingLot> getLots() {
-        String sql = "SELECT * FROM ParkingLot";
+        String sql = "SELECT * FROM Parking_Lot";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             ParkingLot parkingLot = new ParkingLot();
             parkingLot.setId(rs.getInt("id"));
             parkingLot.setLocation(rs.getString("location"));
-            parkingLot.setBasePrice(rs.getDouble("basePrice"));
+            parkingLot.setBasePrice(rs.getDouble("base_Price"));
             parkingLot.setName(rs.getString("name"));
-            parkingLot.setManagerId(rs.getInt("managerId"));
-            parkingLot.setOccupiedSpots(rs.getInt("occupiedSpots"));
-            parkingLot.setTotalSpots(rs.getInt("totalSpots"));
-            parkingLot.setCurrentPrice(rs.getDouble("currentPrice"));
+            parkingLot.setManagerId(rs.getInt("manager_Id"));
+            parkingLot.setOccupiedSpots(rs.getInt("occupied_Spots"));
+            parkingLot.setTotalSpots(rs.getInt("total_Spots"));
+            parkingLot.setCurrentPrice(rs.getDouble("currend_Price"));
             return parkingLot;
         });
     }

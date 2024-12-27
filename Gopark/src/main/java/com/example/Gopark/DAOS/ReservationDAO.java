@@ -52,4 +52,24 @@ public class ReservationDAO {
             }
         });
     }
+
+    public List<Reservation> getActiveReservationsForLot(int parkID) {
+        String sql = "SELECT * FROM reservation " +
+                "WHERE lot_id = ? AND end_time > NOW()";
+
+        return jdbcTemplate.query(sql, new Object[]{parkID}, new RowMapper<Reservation>() {
+            @Override
+            public Reservation mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Reservation reservation = new Reservation();
+                reservation.setId(rs.getInt("id"));
+                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setLotId(rs.getInt("lot_id"));
+                reservation.setSpotNumber(rs.getInt("spot_number"));
+                reservation.setStartTime(rs.getTimestamp("start_time"));
+                reservation.setEndTime(rs.getTimestamp("end_time"));
+                reservation.setCost(rs.getDouble("cost"));
+                return reservation;
+            }
+        });
+    }
 }

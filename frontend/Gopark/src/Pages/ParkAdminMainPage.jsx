@@ -3,21 +3,28 @@ import ParkBox from "../Components/ParkBox";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 const ParkAdminMainPage = () =>{
-    const location = useLocation();
-    // const { lot } = location.state || {ID: "", locationCoor: {lat: NaN, lng:NaN}, name:"", capacity:"", type:"", pricingStruct:""};
-    const lot = {ID: 1, locationCoor: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", capacity: 4, type: 'RETULAR', 
-    pricingStruct: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
-    };
-    const [loadedLot, setLoadedLot] = useState({});
+    const [loadedLot, setLoadedLot] = useState({id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
+        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        });
     const [spots, setSpots] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formVariables, setFormVariables] = useState({});
     
     useEffect(()=>{
-        setFormVariables({name: lot.name, capacity: lot.capacity, type: lot.type, pricingStruct: lot.pricingStruct});
-        setLoadedLot(()=>lot);
+        loadPark();
+        setFormVariables({name: loadedLot.name, totalSpots: loadedLot.totalSpots, type: loadedLot.type, pricingStruct: loadedLot.pricingStruct});
     }, []);
    
+    // loading parks API
+    const loadPark = async ()=>{
+        await fetch(`http://localhost:8081/getLot/${1}`)
+        .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
+        .then((parksData)=>{
+            setLoadedLot(parksData);
+        })
+        .catch(e=>console.log(e));
+    }
+
     const notifySuccessEditing = () => {
         toast.success(`Changes saved successfully`);
     };
@@ -27,7 +34,7 @@ const ParkAdminMainPage = () =>{
     };
 
     const editLot = async()=>{
-        await fetch(`http://localhost:8081/api/v1/lot/admins/editLot?ID=${loadedLot.ID}`,{
+        await fetch(`http://localhost:8081/lot/admins/editLot?ID=${loadedLot.ID}`,{
             method:"PUT",
             body:JSON.stringify({
                 ID: loadedLot.ID,
@@ -52,7 +59,7 @@ const ParkAdminMainPage = () =>{
     }
 
     const generateReport = async()=>{
-        
+
     }
 
     const reserveAll = ()=>{
@@ -69,7 +76,7 @@ const ParkAdminMainPage = () =>{
     }
 
     const handleCancel = ()=>{
-        setFormVariables({name: lot.name, capacity: lot.capacity, type: lot.type, pricingStruct: lot.pricingStruct});
+        setFormVariables({name: loadedLot.name, capacity: loadedLot.capacity, type: loadedLot.type, pricingStruct: loadedLot.pricingStruct});
         setIsEditing(false);
     }
     return(
