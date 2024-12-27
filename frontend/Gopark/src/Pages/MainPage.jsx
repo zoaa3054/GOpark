@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ParkBox from '../Components/ParkBox';
 import profileIcon from '../assets/profile.png';
 import Modal from 'react-modal';
+import { Buffer } from "buffer";
+
 const libraries = ['places'];
 const MainPage = () => {
     const location = useLocation();
@@ -17,52 +19,71 @@ const MainPage = () => {
         libraries
       });
 
-    const [park, setPark] = useState(null);
+    const [park, setPark] = useState({});
+    const [spots, setSpots] = useState([]);
     const [markerPosition, setMarkerPosition] = useState(false);
     const [showParkSwitch, setShowParkSwitch] = useState(false);
     const [directions, setDirections] = useState(null);
     const [distance, setDistance] = useState('');
     const [duration, setDuration] = useState('');
-    const [parksLoaded, setParksLoaded] = useState([{id: 0, location: {lat: -3.745, lng: -38.523}, name: "Layla", totalSpots: 4,
-        currentPrice: 20,
-        },
-        {id: 1, location: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", totalSpots: 4, 
-        currentPrice: 20,
-        },
-        {id: 2, location: {lat: -3.6792203336730043, lng: -40.35222363281251},  name: "Samia", totalSpots: 4,
-        currentPrice: 20,
-        },
-        {id: 3, location: {lat: -5, lng: -38.523},  name: "Walaa", totalSpots: 4,
-        currentPrice: 20,
-        },
-        {id: 4, location: {lat: -6.745, lng: -38.523},  name: "Hanaa", totalSpots: 4,
-        currentPrice: 20,
-        },
-        {id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
-        currentPrice: 20,
-        }]);
-    const [center, setCenter] = useState(null);
+    // const [parksLoaded, setParksLoaded] = useState([{id: 0, location: {lat: -3.745, lng: -38.523}, name: "Layla", totalSpots: 4,
+    //     currentPrice: 20,
+    //     },
+    //     {id: 1, location: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", totalSpots: 4, 
+    //     currentPrice: 20,
+    //     },
+    //     {id: 2, location: {lat: -3.6792203336730043, lng: -40.35222363281251},  name: "Samia", totalSpots: 4,
+    //     currentPrice: 20,
+    //     },
+    //     {id: 3, location: {lat: -5, lng: -38.523},  name: "Walaa", totalSpots: 4,
+    //     currentPrice: 20,
+    //     },
+    //     {id: 4, location: {lat: -6.745, lng: -38.523},  name: "Hanaa", totalSpots: 4,
+    //     currentPrice: 20,
+    //     },
+    //     {id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
+    //     currentPrice: 20,
+    //     }]);
+    const [parksLoaded, setParksLoaded] = useState([]);
+    const [center, setCenter] = useState({});
     const destination = useRef();
     const navigate = useNavigate();
     const [showParkSwitchAnimation, setShowParkSwitchAnimation] = useState(false);
    
     useEffect(() => {
-        console.log(user);
       if (isLoaded) {
         setMarkerPosition(true); // Set marker position after map is loaded
       }
 
       loadParks();
       console.log("Parking lots:",parksLoaded);
-      if (center === null) setCenter(parksLoaded[0].location);
+      if (center === null) setCenter(parseMySQLPoint(parksLoaded[0].location));
     }, [isLoaded]);
+
+
+    function parseMySQLPoint(geometryString) {
+        // Convert the escaped string into a buffer
+        const buffer = Buffer.from(
+            geometryString.split('').map(char => char.charCodeAt(0))
+        );
+    
+        if (buffer.length < 25) {
+            throw new Error("Invalid POINT geometry buffer length");
+        }
+    
+        // Read the coordinates (skip SRID and header)
+        const longitude = buffer.readDoubleLE(9); // X coordinate (longitude)
+        const latitude = buffer.readDoubleLE(17); // Y coordinate (latitude)
+    
+        return { lat: latitude, lng: longitude };
+    }
 
     // loading parks API
     const loadParks = async ()=>{
       await fetch(`http://localhost:8081/getLots`)
       .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
       .then((parksData)=>{
-        //   setParksLoaded(parksData);
+          setParksLoaded(()=>parksData);
       })
       .catch(e=>console.log(e));
     }
@@ -72,7 +93,7 @@ const MainPage = () => {
         setShowParkSwitchAnimation(()=>true);      
         setPark(()=>p);
         setShowParkSwitch(()=>true);
-        setCenter(()=>p.location);
+        setCenter(()=>parseMySQLPoint(parseMySQLPoint(p.location)));
     }
 
     const getCoorOfPlace = async (placeName) => {
@@ -145,7 +166,7 @@ const MainPage = () => {
             parksLoaded.map((p, i) => (
                 <Marker 
                     key={i} 
-                    position={p.location} 
+                    position={parseMySQLPoint(p.location)} 
                     clusterer={clusterer} 
                     label={{
                         text: `P${i}`,
@@ -166,7 +187,7 @@ const MainPage = () => {
     style={{content:{backgroundColor:"#00203FFF", animation: `${showParkSwitchAnimation?"fade-in":"fade-out"} 0.5s ease`}, overlay:{backgroundColor:"rgba(173, 239, 209, 0.5)"}}}
     >
     <button className="backButton" onClick={hidePark}>X</button>
-    <ParkBox lot={park} person="user" user={user} getRout={getRout}/>
+    <ParkBox lot={park} person="user" user={user} getRout={getRout} loadSpots={setSpots}/>
 
     </Modal>
     </div>

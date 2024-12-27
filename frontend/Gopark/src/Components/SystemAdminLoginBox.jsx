@@ -21,7 +21,6 @@ const AdminLoginBox = () =>{
         })
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((adminLotsData)=>{
-            console.log(adminLotsData);
             setErrorMessage('');
             navigate('/system/admin/main');
          })

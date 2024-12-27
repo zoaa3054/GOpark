@@ -22,7 +22,6 @@ const LoginBox = () =>{
         })
         .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((userData)=>{
-            console.log("respond: ",userData);
             setErrorMessage('');
             navigate('/main', {state: {user: userData}});
         })  
@@ -40,12 +39,9 @@ const LoginBox = () =>{
                 <label htmlFor="password"><b>Password</b></label>
                 <input type="password" name='password' placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required></input>
                 {errorTrigger == "emailError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>}
-                <Link className="forgotPasswordLink" to="/forgotpassword">Forgot Password?</Link>
                 <button className="loginButton" form="loginForm" type="submit">Login</button>
             </form>
             <p className="lineWithText"><span>Or</span></p>
-            {/* <div id="loginGoogleButton"></div>
-            {errorTrigger == "googleEmailError"?<p style={{color:'red', fontSize:'1rem'}}>{errorMessage}</p>:<></>} */}
             <center>New user? <Link className="signupLink" to="/signup">Signup</Link></center>
         </div>
     );

@@ -33,7 +33,7 @@ public class ParkingSpotDAO {
                 parkingSpot.setParkingLotId(rs.getInt("parking_lot_id"));
                 parkingSpot.setNumber(rs.getInt("number"));
                 parkingSpot.setType(rs.getString("type"));
-                parkingSpot.setRealTimeState(rs.getString("spot_number"));
+                parkingSpot.setRealTimeState(rs.getString("state"));
                 return parkingSpot;
             }
         });

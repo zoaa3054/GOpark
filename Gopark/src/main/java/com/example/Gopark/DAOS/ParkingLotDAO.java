@@ -34,14 +34,14 @@ public class ParkingLotDAO {
     }
 
     public List<ParkingSpot> getSpotsInLot(int id) {
-        String sql = "SELECT * FROM ParkingSpot WHERE parkingLotId = ?";
+        String sql = "SELECT * FROM parking_spot WHERE parking_Lot_Id = ?";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             ParkingSpot spot = new ParkingSpot();
-            spot.setParkingLotId(rs.getInt("parkingLotId"));
+            spot.setParkingLotId(rs.getInt("parking_lot_id"));
             spot.setNumber(rs.getInt("number"));
             spot.setType(rs.getString("type"));
-            spot.setRealTimeState(rs.getString("RealTimeState"));
+            spot.setRealTimeState(rs.getString("state"));
             return spot;
         }, id); // `id` is passed as the parameter to the query
     }
