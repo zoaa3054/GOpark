@@ -64,7 +64,7 @@ public class ParkingLotDAO {
         WHERE 
             p.manager_id = ?
         GROUP BY 
-            p.id, p.location, p.occupied_spots, p.total_spots
+            p.id, p.occupied_spots, p.total_spots
     """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
