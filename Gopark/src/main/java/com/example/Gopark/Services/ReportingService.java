@@ -53,8 +53,8 @@ public class ReportingService {
             JasperReport jasperReport2=JasperCompileManager.compileReport(path2);
             JasperPrint jasperPrint1 = JasperFillManager.fillReport(jasperReport1, parameters1, new JREmptyDataSource());
             JasperPrint jasperPrint2=JasperFillManager.fillReport(jasperReport2,parameters2,new JREmptyDataSource());
-            JasperExportManager.exportReportToPdfFile(jasperPrint1, "ManagerOccupancyReport.pdf");
-            JasperExportManager.exportReportToPdfFile(jasperPrint2,"ManagerViolationsReport.pdf");
+            JasperExportManager.exportReportToPdfFile(jasperPrint1, "ManagerOccupancyReport_" + managerId + ".pdf");
+            JasperExportManager.exportReportToPdfFile(jasperPrint2,"ManagerViolationsReport_" + managerId + ".pdf");
         } catch (Exception e) {
             e.printStackTrace();
         }
