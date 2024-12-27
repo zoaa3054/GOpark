@@ -24,13 +24,14 @@ public class ParkingLotDAO {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             ParkingLot parkingLot = new ParkingLot();
             parkingLot.setId(( rs.getLong("id")));
-            //parkingLot.setLocation((Point) rs.getObject("location"));
+            parkingLot.setLongitude((rs.getFloat("longitude")));
+            parkingLot.setLatitude(((rs.getFloat("latitude"))));
             parkingLot.setBasePrice(rs.getFloat("base_Price"));
             parkingLot.setName(rs.getString("name"));
             parkingLot.setManagerId(rs.getLong("manager_Id"));
             parkingLot.setOccupiedSpots(rs.getInt("occupied_Spots"));
             parkingLot.setTotalSpots(rs.getInt("total_Spots"));
-            parkingLot.setCurrentPrice(rs.getFloat("currend_Price"));
+            parkingLot.setCurrentPrice(rs.getFloat("current_Price"));
             return parkingLot;
         });
     }
