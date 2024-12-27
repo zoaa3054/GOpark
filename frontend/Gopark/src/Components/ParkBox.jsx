@@ -16,10 +16,10 @@ const spotTypeMaper = {
     'EVCHARGING': 2
 }
 
-const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
+const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const [firstHalfSpots, setFirstHalfSpots] = useState([]);
     const [secondHalfSpots, setSecondHalfSpots] = useState([]);
-    const [parkSpots, setParkSpots] = useState([{number: 1, RealTimeState: 'OCCUPOID'}, {number: 3, RealTimeState: 'AVAILABLE'}, {number: 4, RealTimeState: 'OCCUPOID'}, {number: 5, RealTimeState: 'OCCUPOID'}, {number: 6, RealTimeState: 'AVAILABLE'}]);
+    const [parkSpots, setParkSpots] = useState([{number: 1, RealTimeState: 'OCCUPOID', type: 'REGULAR'}]);
     const [isHoverd, setIsHoverd] = useState(false);
     const [hoverdObj, setHoverdObj] = useState(NaN);
     const [showOriginInput, setShowOriginInput] = useState(false);
@@ -29,34 +29,33 @@ const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
     const [toTime, setToTime] = useState('');
     const [fromDay, setFromDay] = useState('');
     const [toDay, setToDay] = useState('');
-    const [type, setType] = useState('');
+    const [type, setType] = useState('REGULAR');
     const [counter, setCounter] = useState(0);
     const origin = useRef();
     const targetRef = useRef(null);
 
     // useEffect refreshes the spots every second
     useEffect(()=>{
-        let interval = setInterval(()=>{
-            getSpots();
-        }, 1000);
+        // let interval = setInterval(()=>{
+        //     getSpots();
+        // }, 1000);
 
         setFirstHalfSpots(()=>parkSpots.slice(0, Math.ceil(parkSpots.length / 2)));
         setSecondHalfSpots(()=>parkSpots.slice(Math.ceil(parkSpots.length / 2), parkSpots.length));
 
-        return ()=>clearInterval(interval);
+        // return ()=>clearInterval(interval);
     }, [parkSpots]);
 
-    const notifySuccessReserving = () => {
-        toast.success(`Spot Reserved successfully`);
+    const notifySuccessReserving = (number) => {
+        toast.success(`Spot reserved succeffully\nYour spote number is ${number}`);
     };
 
-    const notifyFaildReserving = () => {
-        toast.error(`Faild to reserve spot`);
+    const notifyFaildReserving = (message) => {
+        toast.error(message);
     };
 
     const handleScroll = () => {
         if (targetRef.current) {
-            console.log(targetRef);
           targetRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }
@@ -73,55 +72,68 @@ const ParkBox = ({ lot, person, getRout, loadSpots }) =>{
         .then(response=>response.status==200 || response.status==201?(()=>{return response.json()})(): (()=>{throw Error("Error fetching reservations")})())
         .then(reservationsData=>{
             setSpotsReservations(reservationsData);
+            console.log("reservations: ", reservationsData);
         })
         .catch(e=>console.error(e));
     }
 
     const getSpotByNumber = (number)=>{
-        for (spot in parkSpots){
+        for (let spot in parkSpots){
             if (spot.number == number) return spot
         }
     }
 
     const getSpotsByType = (spotType)=>{
         let buffer = [];
-        for (spot in parkSpots){
-            if (spot.type == spotType) buffer.add(spot);
+        for (let i=0; i<parkSpots.length; i++){
+            if (parkSpots[i].type == spotType) buffer.push(parkSpots[i]);
         }
         return buffer;
     }
     const reserveSpot = async(e)=>{
         e.preventDefault();
         getSpotsReservations();
-        const availableSpot = null;
+        const startTimeAsTimeStamp = new Date(`${fromDay}T${fromTime}:00`).getTime();
+        const endTimeAsTimeStamp = new Date(`${toDay}T${toTime}:00`).getTime();
+        let availableSpot = null;
         let spotsByGivenType = getSpotsByType(type);
-
-        for (let spot in spotsByGivenType){
-            for (let reservation in spotsReservations){
-                if (spot.number == reservation.spotNumber 
-                    && ((fromDay < reservation.startTime && toDay <= reservation.startTime)
-                    ||(fromDay >= reservation.endTime && toDay > reservation.endTime)) 
-                    && ((fromTime < reservation.startTime && toTime <= reservation.startTime)
-                    ||(fromTime >= reservation.endTime && toTime > reservation.endTime))){
-                    availableSpot = spot;
+        let violatedFlag = false;
+        for (let i=0; i<spotsByGivenType.length; i++){
+            if (spotsReservations.length == 0) {availableSpot = spotsByGivenType[i];}
+            for (let j=0; j<spotsReservations.length; j++){
+                if (spotsByGivenType[i].number == spotsReservations[j].spotNumber 
+                    && ((startTimeAsTimeStamp < new Date(spotsReservations[j].startTime).getTime()+7_200_000 && endTimeAsTimeStamp <= new Date(spotsReservations[j].startTime).getTime()+7_200_000)
+                    ||(startTimeAsTimeStamp >= new Date(spotsReservations[j].endTime).getTime()+7_200_000 && endTimeAsTimeStamp > new Date(spotsReservations[j].endTime).getTime()+7_200_000))){
+                    availableSpot = spotsByGivenType[i];
+                }else{
+                    violatedFlag = true;
                     break;
                 }
             }
-            if (availableSpot) break
+            if (violatedFlag) break
         }
-        if (availableSpot){
+        if (!violatedFlag){
             const confermation = window.confirm(`You are now about to reserve spot number: ${availableSpot.number} in ${lot.name} lot\nPress confirm to conferm your reservation.`);
             if (confermation){
-                const regester = await fetch(`http://localhost:8081/api/v1/users/reserveSpot?parkID=${lot.id}&spotNumber=${availableSpot.number}`, {
-                    method: 'PUT',
+                const regester = await fetch(`http://localhost:8081/users/reserveSpot`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:JSON.stringify({
+                        'driverId': user.id,
+                        'lotId': lot.id,
+                        'spotNumber': availableSpot.number,
+                        'startTime': startTimeAsTimeStamp,
+                        'endTime': endTimeAsTimeStamp,
+                        'cost': lot.currentPrice
+                    })
                 })
-                .then(response=>response.status==200 || response.status==201? notifySuccessReserving(): (()=>{throw Error("Error reserving spot")})())
-                .catch(e=>{console.log(e); notifyFaildReserving()});
+                .then(response=>response.status==200 || response.status==201? notifySuccessReserving(availableSpot.number): (()=>{throw Error("Error reserving spot")})())
+                .catch(e=>{console.log(e); notifyFaildReserving("Error happend while reserving")});
                 
             }
         }
         else{
-            alert(`Sorry this spot is ${spot.RealTimeState}`);
+            notifyFaildReserving(`Sorry no spot is availavle`);
         }
     }
     return(

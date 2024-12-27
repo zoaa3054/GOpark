@@ -7,7 +7,7 @@ import Modal from 'react-modal';
 const libraries = ['places'];
 const MainPage = () => {
     const location = useLocation();
-    const { user } = location.state || {'driverUserName': "",
+    const { user } = location.state || {'id': "", 'driverUserName': "",
                 'emailAddress': "",
                 'password': "",
                 'phoneNumber': "",
@@ -24,22 +24,22 @@ const MainPage = () => {
     const [distance, setDistance] = useState('');
     const [duration, setDuration] = useState('');
     const [parksLoaded, setParksLoaded] = useState([{id: 0, location: {lat: -3.745, lng: -38.523}, name: "Layla", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         },
         {id: 1, location: {lat: -4.939050898951398, lng: -37.97368359375001},  name: "Klara", totalSpots: 4, 
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         },
         {id: 2, location: {lat: -3.6792203336730043, lng: -40.35222363281251},  name: "Samia", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         },
         {id: 3, location: {lat: -5, lng: -38.523},  name: "Walaa", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         },
         {id: 4, location: {lat: -6.745, lng: -38.523},  name: "Hanaa", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         },
         {id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
+        currentPrice: 20,
         }]);
     const [center, setCenter] = useState(null);
     const destination = useRef();
@@ -166,7 +166,7 @@ const MainPage = () => {
     style={{content:{backgroundColor:"#00203FFF", animation: `${showParkSwitchAnimation?"fade-in":"fade-out"} 0.5s ease`}, overlay:{backgroundColor:"rgba(173, 239, 209, 0.5)"}}}
     >
     <button className="backButton" onClick={hidePark}>X</button>
-    <ParkBox lot={park} person="user" getRout={getRout}/>
+    <ParkBox lot={park} person="user" user={user} getRout={getRout}/>
 
     </Modal>
     </div>
