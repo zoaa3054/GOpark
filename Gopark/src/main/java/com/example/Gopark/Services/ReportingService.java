@@ -29,8 +29,8 @@ public class ReportingService {
 
 
     public void getManagerReports(Long managerId) {
-        String path1 = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\managerOccupancyReport.jrxml";
-        String path2="C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\managerViolationsReport.jrxml";
+        String path1 = "C:\\Users\\KimoStore\\Desktop\\managerOccupancyReport.jrxml";
+        String path2="C:\\Users\\KimoStore\\Desktop\\managerViolationsReport.jrxml";
         List<ManagerReportData> occupancyRates = parkingLotDAO.getOccupancyRateByManagerID(managerId);
         List<Violation> violations = parkingLotDAO.getViolationsByManagerID(managerId);
 
@@ -62,8 +62,8 @@ public class ReportingService {
 
     public void getAdminReport()
     {
-        String path1 = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports2\\AdminTopDriversReport.jrxml";
-        String path2= "C:\\Users\\20100\\JaspersoftWorkspace\\myReports2\\AdminTopLotsReport.jrxml";
+        String path1 = "C:\\Users\\KimoStore\\Desktop\\AdminTopDriversReport.jrxml";
+        String path2= "C:\\Users\\KimoStore\\Desktop\\AdminTopLotsReport.jrxml";
 
         // Get the data for the top 10 drivers
         List<TopDriver> topDrivers = driverDAO.getTopDrivers();

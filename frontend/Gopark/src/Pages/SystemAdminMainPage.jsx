@@ -8,6 +8,7 @@ import binIcon from '../assets/bin.png';
 import addAdminIcon from '../assets/addAdmin.png';
 import addLotIcon from '../assets/addLot.png';
 import logoutIcon from '../assets/logout.png';
+import downloadReportIcon from '../assets/downloadReport.png';
 import { toast } from "react-toastify";
 import AddParkAdminBox from '../Components/AddParkAdminBox';
 import { Buffer } from 'buffer';
@@ -49,7 +50,7 @@ const SystemAdminMainPage = () =>{
 
     // loading parks API
     const loadParks = async ()=>{
-        await fetch(`http://localhost:8081/getLots`)
+        await fetch(`http://localhost:8081/api/v1/users/getLots`)
         .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
         .then((parksData)=>{
             setParksLoaded(parksData);
@@ -72,6 +73,11 @@ const SystemAdminMainPage = () =>{
     const notifyFaildAdding=()=>{
         toast.error("Faild to add the lot");
     }
+
+    const notifyFailiar=(message)=>{
+        toast.error(message);
+    }
+
     const addLot = async()=>{
         console.log({ID:"", ...formVariables});
         await fetch(`http://localhost:8081/api/v1/system/admin/addLot`, {
@@ -129,11 +135,19 @@ const SystemAdminMainPage = () =>{
         setIsEditing(false);
     }
 
+    const createReport = async()=>{
+        await fetch(`http://localhost:8081/admin/report`)
+        .catch(e=>{console.error(e); notifyFailiar("Couldn't create report");});
+    }
+
     return(
         <>
             <div className="navigationBar">
                 <div onClick={()=>setIsEditing(true)}>
                     <img src={addLotIcon} className="navBarButton" style={{width:"3rem", height:"3rem", cursor:"pointer"}} title="Add Lot"/>
+                </div>
+                <div onClick={createReport}>
+                    <img src={downloadReportIcon} className="navBarButton" style={{width:"3rem", height:"3rem", cursor:"pointer"}} title="Add Lot"/>
                 </div>
                 <div style={{width: "75%", textAlign: "center", color: "#ADEFD1FF"}}><h1>GOpark System Admin</h1></div>
                 <div onClick={showAddAdminBox}>

@@ -19,11 +19,11 @@ const AdminLoginBox = () =>{
                 'Password': password
             }
         })
-        .then(response=>response.status==200 || response.status==201?(() => { return response.text() })():(() => { throw new Error('Something went wrong'); })())
+        .then(response=>response.status==200 || response.status==201?(() => { return response.json() })():(() => { throw new Error('Something went wrong'); })())
         .then((lotData)=>{
             console.log(lotData);
             setErrorMessage('');
-            navigate('/park/admin/main');
+            navigate('/park/admin/main', {state:{admin: lotData}});
          })
         .catch(error=>{
             setErrorMessage('Wrong email or password');

@@ -64,7 +64,7 @@ const MainPage = () => {
 
     // loading parks API
     const loadParks = async ()=>{
-      await fetch(`http://localhost:8081/getLots`)
+      await fetch(`http://localhost:8081/api/v1/users/getLots`)
       .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
       .then((parksData)=>{
           setParksLoaded(()=>parksData);

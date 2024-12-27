@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import '../style.css';
-import SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
+import Notification from "./Notification";
 import { toast } from "react-toastify";
 
 
@@ -11,31 +10,14 @@ if (typeof global === "undefined") {
 
 
 const NotificationsBox = ({ userId, showNotificationsBox }) =>{
-    const [notifications, setNotifications] = useState([{}]);
-    const [currentNotification, setCurrentNotification] = useState({});
+    const [notifications, setNotifications] = useState([]);
     useEffect(()=>{
         getNotifications();
-        const socket = new SockJS("http://localhost:8080/ws");
-        const stompClient = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                stompClient.subscribe(`/topic/${driverId}`, (message) => {
-                    const notification = JSON.parse(message.body);
-                    console.log("Notification received:", notification);
-                    setCurrentNotification(notification);
-                    notifiyNewNotification(`\nBody: ${notification.content}\nTimestamp: ${notification.time}`);
-                });
-            },
-        });
+    }, [userId]);
 
-        stompClient.activate();
-
-        return () => {
-            stompClient.deactivate();
-        };
-
-    }, [currentNotification, userId]);
-
+    const handleNotification = (notification) => {
+         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+    };
     const notifiyNewNotification = (message)=>{
         toast.success(message);
     }
@@ -50,6 +32,7 @@ const NotificationsBox = ({ userId, showNotificationsBox }) =>{
     }
     return(
         <div className="notificationsBox" style={{transform: `${showNotificationsBox?"translate(0%, 0%)":"translate(0%, 0%)"}`}}>
+            <Notification handleNotification={handleNotification} driverID={userId}/>
             {notifications.map((notification, i)=>(
                 <div className="notificationCard" key={i}>
                     <big>{notification.content}</big>

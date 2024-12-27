@@ -1,28 +1,40 @@
 import { useEffect, useState } from "react";
 import ParkBox from "../Components/ParkBox";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const ParkAdminMainPage = () =>{
+    const location = useLocation();
+    const { admin } = location.state || {};
     // const [loadedLot, setLoadedLot] = useState({id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4, currentPrice: 30,});
     const [loadedLot, setLoadedLot] = useState({});
     const [spots, setSpots] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formVariables, setFormVariables] = useState({});
-    
+    const [parksLoaded, setParksLoaded] = useState([]);
+    const navigate = useNavigate();
+
     useEffect(()=>{
         loadPark();
         setFormVariables({name: loadedLot.name, totalSpots: loadedLot.totalSpots, type: loadedLot.type, pricingStruct: loadedLot.pricingStruct});
     }, []);
    
+
     // loading parks API
     const loadPark = async ()=>{
-        await fetch(`http://localhost:8081/getLot/${1}`)
+        await fetch(`http://localhost:8081/api/v1/users/getLots`)
         .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
         .then((parksData)=>{
-            setLoadedLot(parksData);
+            console.log(parksData, admin.id);
+            if (parksData.length != 0){
+                for (let i=0; i<parksData.length; i++){
+                    if (admin.id == parksData[i].managerId)
+                        setLoadedLot(parksData[i]);
+                }
+            }
         })
         .catch(e=>console.log(e));
-    }
+      }
+
 
     const notifySuccessEditing = () => {
         toast.success(`Changes saved successfully`);
@@ -31,6 +43,14 @@ const ParkAdminMainPage = () =>{
     const notifyFaildEditing = () => {
         toast.error(`Faild to save changes`);
     };
+
+    const notifyFaild = (message) =>{
+        toast.error(message);
+    }
+
+    const notifySucess = (message) =>{
+        toast.success(message);
+    }
 
     const editLot = async()=>{
         await fetch(`http://localhost:8081/lot/admins/editLot?ID=${loadedLot.ID}`,{
@@ -58,7 +78,10 @@ const ParkAdminMainPage = () =>{
     }
 
     const generateReport = async()=>{
-
+        console.log(typeof(admin), admin.id);
+        await fetch(`http://localhost:8081/manager/report/${admin.id}`)
+        .then(response=>{if(response.status == 200 || response.status == 201) notifySucess("Report generated succeffully")})
+        .catch(e=>{console.error(e); notifyFaild("Couldn't generate report");})
     }
 
     const reserveAll = ()=>{
@@ -84,8 +107,9 @@ const ParkAdminMainPage = () =>{
         <ParkBox lot={loadedLot} person="admin" loadSpots={setSpots}/>
         <div style={{display:"flex", justifyContent:"center"}}>
             <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>setIsEditing(true)}>Edit</button>
-            <button className="backButton" onClick={reserveAll}>Reserve All</button>
-            <button className="backButton" onClick={generateReport}>Generate Report</button>
+            <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>navigate('/')} >logout</button>
+            {/* <button className="backButton" style={{marginRight:"1rem"}} onClick={reserveAll}>Reserve All</button>
+            <button className="backButton" onClick={generateReport}>Generate Report</button> */}
         </div></>
         }
         {isEditing && <div style={{margin:"1rem"}}>

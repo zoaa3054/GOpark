@@ -5,9 +5,10 @@ import PropTypes from 'prop-types';
 import { toast } from "react-toastify";
 
 const statusColorMaper = {
-    'OCCUPOID': 'red',
-    'AVAILABLE': '#44ea3b',
-    'NULL': 'white'
+    'occupied': 'red',
+    'available': '#44ea3b',
+    'reserved': 'pink',
+    'null': 'white'
 };
 
 const spotTypeMaper = {
@@ -30,7 +31,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const [toTime, setToTime] = useState('');
     const [fromDay, setFromDay] = useState('');
     const [toDay, setToDay] = useState('');
-    const [type, setType] = useState('REGULAR');
+    const [type, setType] = useState('regular');
     const [counter, setCounter] = useState(0);
     const origin = useRef();
     const targetRef = useRef(null);
@@ -38,7 +39,8 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     // useEffect refreshes the spots every second
     useEffect(()=>{
         let interval = setInterval(()=>{
-            getSpots();
+            if (person == "user") getSpotsReservations();
+            // getSpots();
         }, 1000);
 
         setFirstHalfSpots(()=>parkSpots.slice(0, Math.ceil(parkSpots.length / 2)));
@@ -62,9 +64,9 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     }
 
     const getSpots = async()=>{
-        await fetch(`http://localhost:8081/getLot/${lot.id}`)
-        .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error reserving spot")})())
-        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots); console.log(spots);})
+        await fetch(`http://localhost:8081/api/v1/getSpots/${lot.id}`)
+        .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error fetching spots")})())
+        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots); console.log("spots: ",spots);})
         .catch(e=>console.error(e));
     }    
 
@@ -72,7 +74,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
         await fetch(`http://localhost:8081/users/getActiveReservationByLot?parkID=${lot.id}`)
         .then(response=>response.status==200 || response.status==201?(()=>{return response.json()})(): (()=>{throw Error("Error fetching reservations")})())
         .then(reservationsData=>{
-            setSpotsReservations(reservationsData);
+            setSpotsReservations(()=>reservationsData);
         })
         .catch(e=>console.error(e));
     }
@@ -92,12 +94,13 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     }
     const reserveSpot = async(e)=>{
         e.preventDefault();
-        getSpotsReservations();
+        // getSpotsReservations();
         const startTimeAsTimeStamp = new Date(`${fromDay}T${fromTime}:00`).getTime();
         const endTimeAsTimeStamp = new Date(`${toDay}T${toTime}:00`).getTime();
         let availableSpot = null;
         let spotsByGivenType = getSpotsByType(type);
         let violatedFlag = false;
+        console.log("reservations here: ", spotsReservations);
         for (let i=0; i<spotsByGivenType.length; i++){
             violatedFlag = false;
             if (spotsReservations.length == 0) availableSpot = spotsByGivenType[i];
@@ -145,10 +148,9 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     return(
         <div className="parkContainerStyle">
             <center style={{fontSize: "2rem"}}>{lot.name} lot</center>
-            {/* <p>Location: {lot.locationString}</p> */}
             <p>Capacity: {lot.totalSpots} spots</p>
-            <p>Type: {lot.type}</p>
-            <p>Pricing structure: {lot.currentPrice} LE</p>
+            <p>Base price: {lot.basePrice} LE</p>
+            <p>Current price: {lot.currentPrice} LE</p>
             <div className='parkingLots'>
                 <div className='leftLots'>
                     {firstHalfSpots.map((l, i)=>(
@@ -186,25 +188,16 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
                                             <input type="date" name="toDay" placeholder="to Day" style={{width:"fit-content"}} value={toDay} onChange={(e)=>setToDay(e.target.value)}/>
                                             <label htmlFor="type" style={{textAlign:"left"}}>Spot Type</label>
                                             <select placeholder="Type" name="type" value={type} onChange={(e)=>setType(e.target.value)}>
-                                                <option value="REGULAR">REGULAR</option>    
-                                                <option value="DISABLED">DISABLED</option>    
-                                                <option value="EVCHARGING">EVCHARGING</option>    
+                                                <option value="regular">REGULAR</option>    
+                                                <option value="disabled">DISABLED</option>    
+                                                <option value="EV charging">EVCHARGING</option>    
                                             </select>
 
                                         <button type="submit" className="backButton" style={{marginLeft:"0.5rem"}}>Search for spot</button>
                                         </form>
                                         </center>}
 
-            {person == "admin" && 
-            <div className='analysisArea'>
-                <hr style={{color:"black"}}/>
-                <p>
-                Occupancy rates: {}<br/>
-                Revenue: {}<br/>
-                Violations/Overstayings: {}
-                
-                </p>
-            </div>}
+
             <div ref={targetRef}/>
         </div>
     );
