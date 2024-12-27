@@ -17,8 +17,8 @@ public class ReportingController {
     {
          service.getManagerReports(managerId);
     }
-    @GetMapping("/admin/report/{adminId}")
-    public void exportAdminReport(@PathVariable Long  adminId)
+    @GetMapping("/admin/report")
+    public void exportAdminReport()
     {
         service.getAdminReport();
     }

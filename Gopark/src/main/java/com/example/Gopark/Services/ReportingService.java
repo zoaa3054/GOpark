@@ -29,32 +29,32 @@ public class ReportingService {
 
 
     public void getManagerReports(Long managerId) {
-        String path = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\managerReport.jrxml";
+        String path1 = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\managerOccupancyReport.jrxml";
+        String path2="C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\managerViolationsReport.jrxml";
         List<ManagerReportData> occupancyRates = parkingLotDAO.getOccupancyRateByManagerID(managerId);
         List<Violation> violations = parkingLotDAO.getViolationsByManagerID(managerId);
 
-        Double totalRevenue = occupancyRates.stream()
-                .mapToDouble(ManagerReportData::getRevenue)
-                .sum();
+
 
         // Create data sources
         JRBeanCollectionDataSource occupancyRatesDataSource = new JRBeanCollectionDataSource(occupancyRates);
         JRBeanCollectionDataSource violationsDataSource = new JRBeanCollectionDataSource(violations);
 
         // Parameters for Jasper
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("totalRevenue", totalRevenue);
-        parameters.put("occupancyRatesDataSource", occupancyRatesDataSource);
-        parameters.put("violationsDataSource", violationsDataSource);
+        Map<String, Object> parameters1 = new HashMap<>();
+        parameters1.put("revenueOccupancyDataSource", occupancyRatesDataSource);
+
+        Map<String,Object>parameters2=new HashMap<>();
+        parameters2.put("violationsDataSource", violationsDataSource);
 
         // Compile and generate the report
         try {
-            JasperReport jasperReport = JasperCompileManager.compileReport(path);
-            // Use violationsDataSource instead of JREmptyDataSource
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, violationsDataSource);
-
-            // Export the report (PDF example)
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "ManagerReport.pdf");
+            JasperReport jasperReport1 = JasperCompileManager.compileReport(path1);
+            JasperReport jasperReport2=JasperCompileManager.compileReport(path2);
+            JasperPrint jasperPrint1 = JasperFillManager.fillReport(jasperReport1, parameters1, new JREmptyDataSource());
+            JasperPrint jasperPrint2=JasperFillManager.fillReport(jasperReport2,parameters2,new JREmptyDataSource());
+            JasperExportManager.exportReportToPdfFile(jasperPrint1, "ManagerOccupancyReport.pdf");
+            JasperExportManager.exportReportToPdfFile(jasperPrint2,"ManagerViolationsReport.pdf");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,7 +62,8 @@ public class ReportingService {
 
     public void getAdminReport()
     {
-        String path = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports\\AdminReport.jrxml";
+        String path1 = "C:\\Users\\20100\\JaspersoftWorkspace\\MyReports2\\AdminTopDriversReport.jrxml";
+        String path2= "C:\\Users\\20100\\JaspersoftWorkspace\\myReports2\\AdminTopLotsReport.jrxml";
 
         // Get the data for the top 10 drivers
         List<TopDriver> topDrivers = driverDAO.getTopDrivers();
@@ -70,22 +71,26 @@ public class ReportingService {
         // Get the data for the top parking lots
         List<TopParkingLot> topParkingLots = parkingLotDAO.getTopParkingLots();
 
+
         // Create data sources
         JRBeanCollectionDataSource driversDataSource = new JRBeanCollectionDataSource(topDrivers);
         JRBeanCollectionDataSource lotsDataSource = new JRBeanCollectionDataSource(topParkingLots);
 
-        // Parameters for the report
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("driversDataSource", driversDataSource);
-        parameters.put("lotsDataSource", lotsDataSource);
+
 
         // Compile and generate the report
         try {
-            JasperReport jasperReport = JasperCompileManager.compileReport(path);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+            Map<String, Object> parameters1 = new HashMap<>();
+            parameters1.put("driversDataSource", new JRBeanCollectionDataSource(topDrivers));
 
-            // Export the report (PDF example)
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "AdminReport.pdf");
+            Map<String,Object>parameters2=new HashMap<>();
+            parameters2.put("lotsDataSource", new JRBeanCollectionDataSource(topParkingLots));
+            JasperReport jasperReport1 = JasperCompileManager.compileReport(path1);
+            JasperReport jasperReport2=JasperCompileManager.compileReport(path2);
+            JasperPrint jasperPrint1 = JasperFillManager.fillReport(jasperReport1, parameters1, new JREmptyDataSource());
+            JasperPrint jasperPrint2=JasperFillManager.fillReport(jasperReport2,parameters2,new JREmptyDataSource());
+            JasperExportManager.exportReportToPdfFile(jasperPrint1, "AdminDriversReport.pdf");
+            JasperExportManager.exportReportToPdfFile(jasperPrint2,"AdminLotsReport.pdf");
         } catch (Exception e) {
             e.printStackTrace();
         }
