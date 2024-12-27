@@ -16,6 +16,7 @@ public class ReservationDAO {
     public ReservationDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     public void insertReservation(Reservation reservation) {
         String sql = "INSERT INTO reservation (driver_id, lot_id, spot_number, start_time, end_time, cost) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -37,7 +38,7 @@ public class ReservationDAO {
         String sql = "SELECT * FROM reservation " +
                 "WHERE lot_id = ? AND spot_number = ? AND end_time > NOW()";
 
-        return jdbcTemplate.query(sql, new Object[]{parkingLotId, spotNumber}, new RowMapper<Reservation>() {
+        return jdbcTemplate.query(sql, new Object[] { parkingLotId, spotNumber }, new RowMapper<Reservation>() {
             @Override
             public Reservation mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Reservation reservation = new Reservation();
@@ -57,7 +58,7 @@ public class ReservationDAO {
         String sql = "SELECT * FROM reservation " +
                 "WHERE lot_id = ? AND end_time > NOW()";
 
-        return jdbcTemplate.query(sql, new Object[]{parkID}, new RowMapper<Reservation>() {
+        return jdbcTemplate.query(sql, new Object[] { parkID }, new RowMapper<Reservation>() {
             @Override
             public Reservation mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Reservation reservation = new Reservation();
