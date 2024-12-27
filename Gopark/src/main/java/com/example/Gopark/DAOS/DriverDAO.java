@@ -15,7 +15,7 @@ public class DriverDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Driver insertDriver(Driver driver) throws RuntimeException{
+    public Driver insertDriver(Driver driver) throws RuntimeException {
         String sql = "INSERT INTO DRIVER (driver_username, password, email, phone, car_plate) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try {
@@ -39,7 +39,7 @@ public class DriverDAO {
     public Driver login(String emailAddress, String password) {
         String sql = "SELECT * FROM DRIVER WHERE email = ? AND password = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, new Object[] { emailAddress, password }, (rs, rowNum) -> {
                 Driver driver = new Driver();
                 driver.setId(rs.getInt("id"));
                 driver.setDriverUserName(rs.getString("driver_username"));

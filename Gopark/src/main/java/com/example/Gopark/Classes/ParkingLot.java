@@ -1,17 +1,17 @@
 package com.example.Gopark.Classes;
 
 import lombok.Data;
+import org.springframework.data.geo.Point;
 
 @Data
 public class ParkingLot {
-
-    private int id;
-    private String location;
-    private double basePrice;
+    private Long id;
+    private Float longitude;
+    private Float latitude;
+    private Float basePrice;
     private String name;
-    private int managerId;
-    private int occupiedSpots;
-    private int totalSpots;
-    private double currentPrice;
-
+    private Long managerId;
+    private Integer totalSpots;
+    private Integer occupiedSpots;
+    private Float currentPrice;
 }

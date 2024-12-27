@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public class ParkingSpotDAO {
 
-    //TODO : add Trigger to change spot status and current price of the lot
+    // TODO : add Trigger to change spot status and current price of the lot
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -26,7 +26,7 @@ public class ParkingSpotDAO {
         String sql = "SELECT * FROM PARKING_SPOT " +
                 "WHERE parking_lot_id = ? ";
 
-        return jdbcTemplate.query(sql, new Object[]{lotId}, new RowMapper<ParkingSpot>() {
+        return jdbcTemplate.query(sql, new Object[] { lotId }, new RowMapper<ParkingSpot>() {
             @Override
             public ParkingSpot mapRow(ResultSet rs, int rowNum) throws SQLException {
                 ParkingSpot parkingSpot = new ParkingSpot();

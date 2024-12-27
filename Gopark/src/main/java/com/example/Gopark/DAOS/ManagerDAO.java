@@ -36,7 +36,7 @@ public class ManagerDAO {
     public Manager login(String emailAddress, String password) {
         String sql = "SELECT * FROM MANAGER WHERE email = ? AND password = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{emailAddress, password}, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, new Object[] { emailAddress, password }, (rs, rowNum) -> {
                 Manager manager = new Manager();
                 manager.setId(rs.getInt("id"));
                 manager.setUserName(rs.getString("username"));

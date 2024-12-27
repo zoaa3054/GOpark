@@ -21,13 +21,13 @@ public class ParkingLotController {
         this.parkingLotService = parkingLotService;
     }
 
-    @GetMapping("/getLot/{id}")
+    @GetMapping("/api/v1/getSpots/{id}")
     public List<ParkingSpot> getLotByID(@PathVariable int id)
     {
          return parkingLotService.getLotByID(id);
     }
 
-    @GetMapping("/getLots")
+    @GetMapping("/api/v1/users/getLots")
     public List<ParkingLot> getLotsByLocation()
     {
         return parkingLotService.getAllParkingLots();
