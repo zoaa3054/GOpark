@@ -15,6 +15,11 @@ import { ToastContainer } from 'react-toastify';
 import Modal from 'react-modal';
 Modal.setAppElement("#root");
 
+if (typeof global === "undefined") {
+  window.global = window;
+}
+
+
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(

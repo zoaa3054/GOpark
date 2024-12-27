@@ -4,7 +4,11 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { toast } from "react-toastify";
 
-window.global = window;
+
+if (typeof global === "undefined") {
+    window.global = window;
+}
+
 
 const NotificationsBox = ({ userId, showNotificationsBox }) =>{
     const [notifications, setNotifications] = useState([{}]);

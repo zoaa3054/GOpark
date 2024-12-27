@@ -13,6 +13,7 @@
     "@react-google-maps/api": "^2.20.3",
     "@stomp/stompjs": "^7.0.0",
     "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "global": "^4.4.0",
     "gopark": "file:",
     "js-cookie": "^3.0.5",

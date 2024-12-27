@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Manager {
-    int id;
+    Long id;
     String userName;
     String password;
     String emailAddress;
