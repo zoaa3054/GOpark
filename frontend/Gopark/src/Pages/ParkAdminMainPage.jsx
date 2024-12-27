@@ -3,9 +3,8 @@ import ParkBox from "../Components/ParkBox";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 const ParkAdminMainPage = () =>{
-    const [loadedLot, setLoadedLot] = useState({id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4,
-        currentPrice: 'For all lots (per hour):\n12PM-3PM: 10LE\n3PM-9PM: 20LE\n9PM-11:59AM: 15LE\nMaximum Reservation time: 1 hr\nMaximum Occupacy time: 5 hr\n Any voilation worths 20 LE/hr',
-        });
+    // const [loadedLot, setLoadedLot] = useState({id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4, currentPrice: 30,});
+    const [loadedLot, setLoadedLot] = useState({});
     const [spots, setSpots] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formVariables, setFormVariables] = useState({});

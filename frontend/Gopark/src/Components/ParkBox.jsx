@@ -19,7 +19,8 @@ const spotTypeMaper = {
 const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const [firstHalfSpots, setFirstHalfSpots] = useState([]);
     const [secondHalfSpots, setSecondHalfSpots] = useState([]);
-    const [parkSpots, setParkSpots] = useState([{number: 1, RealTimeState: 'OCCUPOID', type: 'REGULAR'}]);
+    // const [parkSpots, setParkSpots] = useState([{number: 1, realTimeState: 'OCCUPOID', type: 'REGULAR'}]);
+    const [parkSpots, setParkSpots] = useState([]);
     const [isHoverd, setIsHoverd] = useState(false);
     const [hoverdObj, setHoverdObj] = useState(NaN);
     const [showOriginInput, setShowOriginInput] = useState(false);
@@ -36,14 +37,14 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
 
     // useEffect refreshes the spots every second
     useEffect(()=>{
-        // let interval = setInterval(()=>{
-        //     getSpots();
-        // }, 1000);
+        let interval = setInterval(()=>{
+            getSpots();
+        }, 1000);
 
         setFirstHalfSpots(()=>parkSpots.slice(0, Math.ceil(parkSpots.length / 2)));
         setSecondHalfSpots(()=>parkSpots.slice(Math.ceil(parkSpots.length / 2), parkSpots.length));
 
-        // return ()=>clearInterval(interval);
+        return ()=>clearInterval(interval);
     }, [parkSpots]);
 
     const notifySuccessReserving = (number) => {
@@ -63,7 +64,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const getSpots = async()=>{
         await fetch(`http://localhost:8081/getLot/${lot.id}`)
         .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error reserving spot")})())
-        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots);})
+        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots); console.log(spots);})
         .catch(e=>console.error(e));
     }    
 
@@ -146,14 +147,14 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
             <div className='parkingLots'>
                 <div className='leftLots'>
                     {firstHalfSpots.map((l, i)=>(
-                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.RealTimeState]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.RealTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
+                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.realTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
                             <p>{l.number}</p>
                         </div>)
                     )}
                 </div>
                 <div className='rightLots'>
                     {secondHalfSpots.map((l, i)=>(
-                        <div className='lot' key={i+firstHalfSpots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.RealTimeState]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfSpots.length ?statusColorMaper[l.RealTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
+                        <div className='lot' key={i+firstHalfSpots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfSpots.length ?statusColorMaper[l.realTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
                             <p>{l.number}</p>
                         </div>)
                     )}
