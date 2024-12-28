@@ -1,5 +1,6 @@
 package com.example.Gopark.DAOS;
 
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
 import com.example.Gopark.Classes.Reservation;
@@ -8,7 +9,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ReservationDAO {
@@ -26,20 +29,30 @@ public class ReservationDAO {
     }
 
     public void insertReservation(Reservation reservation) {
-        String sql = "INSERT INTO reservation (driver_id, lot_id, spot_number, start_time, end_time, cost) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
-        System.out.println(reservation.getDriverId());
-        int rowsInserted = jdbcTemplate.update(sql,
-                reservation.getDriverId(),
+        // String sql = "INSERT INTO reservation (driver_id, lot_id, spot_number,
+        // start_time, end_time, cost) " +
+        // "VALUES (?, ?, ?, ?, ?, ?)";
+        // System.out.println(reservation.getDriverId());
+        // int rowsInserted = jdbcTemplate.update(sql,
+        // reservation.getDriverId(),
+        // reservation.getLotId(),
+        // reservation.getSpotNumber(),
+        // reservation.getStartTime(),
+        // reservation.getEndTime(),
+        // reservation.getCost());
+        //
+        // if (rowsInserted == 0) {
+        // throw new RuntimeException("Failed to insert reservation.");
+        // }
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withProcedureName("create_reservation_future");
+        String sql = "CALL create_reservation_future(?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, reservation.getStartTime(),
+                reservation.getEndTime(),
                 reservation.getLotId(),
                 reservation.getSpotNumber(),
-                reservation.getStartTime(),
-                reservation.getEndTime(),
+                reservation.getDriverId(),
                 reservation.getCost());
-
-        if (rowsInserted == 0) {
-            throw new RuntimeException("Failed to insert reservation.");
-        }
     }
 
     public List<Reservation> getActiveReservationsForSpot(int parkingLotId, int spotNumber) {
