@@ -1,12 +1,15 @@
 package com.example.Gopark.Simulation;
 
+import com.example.Gopark.Classes.NotificationMessage;
 import com.example.Gopark.Classes.Reservation;
 import com.example.Gopark.Classes.ParkingSpot;
+import com.example.Gopark.Services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -16,9 +19,11 @@ import java.util.List;
 public class ParkingSimulator {
 
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(fixedRate = 60000) // Executes every minute
+    @Scheduled(fixedRate = 5 * 60000) // Executes every minute
     public void updateReservationsAndParkingSpots() {
         try {
             // Query to retrieve active reservations with null arrival
@@ -26,7 +31,7 @@ public class ParkingSimulator {
             List<Reservation> activeReservations = jdbcTemplate.query(reservationQuery, new Object[]{Timestamp.from(Instant.now()), Timestamp.from(Instant.now())}, (rs, rowNum) -> {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
-                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setDriverId(rs.getLong("driver_id"));
                 reservation.setLotId(rs.getInt("lot_id"));
                 reservation.setSpotNumber(rs.getInt("spot_number"));
                 reservation.setStartTime(rs.getTimestamp("start_time"));
@@ -57,11 +62,16 @@ public class ParkingSimulator {
                         String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
                         // Execute the insert
                         jdbcTemplate.update(insertQuery,
-                                "nonuse",
+                                "non-use",
                                 (double) (minutes * 0.2),
                                 false,
                                 reservation.getId()
                         );
+                        NotificationMessage message = new NotificationMessage(
+                                "Your are late and got fined with " + (minutes * 0.2) + "$",
+                                Timestamp.from(Instant.now())
+                        );
+                        notificationService.sendMessageToDriver(reservation.getDriverId(), message);
                     }
                 }
             }
@@ -72,7 +82,7 @@ public class ParkingSimulator {
             List<Reservation> departedReservations = jdbcTemplate.query(departedReservationQuery, new Object[]{Timestamp.from(Instant.now())}, (rs, rowNum) -> {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
-                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setDriverId(rs.getLong("driver_id"));
                 reservation.setLotId(rs.getInt("lot_id"));
                 reservation.setSpotNumber(rs.getInt("spot_number"));
                 reservation.setStartTime(rs.getTimestamp("start_time"));
@@ -92,11 +102,16 @@ public class ParkingSimulator {
                     long minutes = (reservation.getEndTime().getTime() - reservation.getStartTime().getTime()) / (1000 * 60);
                     // Execute the insert
                     jdbcTemplate.update(insertQuery,
-                            "nonuse",
+                            "non-use",
                             (double) (minutes * 0.2),
                             false,
                             reservation.getId()
                     );
+                    NotificationMessage message = new NotificationMessage(
+                            "Your didn't show up and got fined with " + (minutes * 0.2) + "$",
+                            Timestamp.from(Instant.now())
+                    );
+                    notificationService.sendMessageToDriver(reservation.getDriverId(), message);
                 }
                 else {
                     boolean updateOrNot = (Math.random() > 0.2);
@@ -113,15 +128,21 @@ public class ParkingSimulator {
 
                         long minutes = differenceInMillis / (1000 * 60);
                         System.out.println(differenceInMillis + " " + minutes);
-                        if(minutes >= 0) {
+                        if(minutes >= 2) {
                             String insertQuery = "INSERT INTO violation (type, penalty, paid, reservation_id) VALUES (?, ?, ?, ?)";
                             // Execute the insert
                             jdbcTemplate.update(insertQuery,
-                                    "overuse",
+                                    "overstay",
                                     (double) (minutes * 0.2),
                                     false,
                                     reservation.getId()
                             );
+
+                            NotificationMessage message = new NotificationMessage(
+                                    "You over stayed in the parking spot and got fined with " + (minutes * 0.2) + "$",
+                                    Timestamp.from(Instant.now())
+                            );
+                            notificationService.sendMessageToDriver(reservation.getDriverId(), message);
                         }
                     }
                 }
@@ -135,7 +156,7 @@ public class ParkingSimulator {
             }, (rs, rowNum) -> {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
-                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setDriverId(rs.getLong("driver_id"));
                 reservation.setLotId(rs.getInt("lot_id"));
                 reservation.setSpotNumber(rs.getInt("spot_number"));
                 reservation.setStartTime(rs.getTimestamp("start_time"));
@@ -147,7 +168,11 @@ public class ParkingSimulator {
             });
 
             for(Reservation reservation : endingSoonReservations) {
-                // todo: sending notifications by driver id
+                NotificationMessage message = new NotificationMessage(
+                        "Your reservation is about to expire!",
+                        Timestamp.from(Instant.now())
+                );
+                notificationService.sendMessageToDriver(reservation.getDriverId(), message);
             }
 
         } catch (Exception e) {

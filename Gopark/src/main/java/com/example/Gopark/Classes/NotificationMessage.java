@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -12,5 +13,5 @@ import java.sql.Time;
 public class NotificationMessage {
 
     private String content;
-    private Time time;
+    private Timestamp time;
 }
