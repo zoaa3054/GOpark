@@ -77,6 +77,7 @@ public class ParkingLotDAO {
                 long currentLotId = resultLots.get(resultLots.size()-1).getId();
                 String sqlForSpots = "INSERT INTO parking_spot (parking_lot_id, number, type, state) " +
                         "VALUES (?, ?, ?, ?)";
+                System.out.println("number of disapled spots: " + numberOfDisapledSpots);
                 for (int i=1; i<=parkingLot.getTotalSpots(); i++) {
                     String type = null;
                     if (numberOfRequlerSpots > 0){
@@ -84,7 +85,9 @@ public class ParkingLotDAO {
                         --numberOfRequlerSpots;
                     }
                     else if (numberOfDisapledSpots > 0){
-                        type = "disapled";
+                        System.out.println("number of disapled spots: " + numberOfDisapledSpots);
+
+                        type = "disabled";
                         --numberOfDisapledSpots;
                     }
                     else {

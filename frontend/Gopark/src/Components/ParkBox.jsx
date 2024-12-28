@@ -38,7 +38,6 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
 
     // useEffect refreshes the spots every second
     useEffect(()=>{
-        console.log("loaded park: ", lot);
         let interval = setInterval(()=>{
             if (person == "user") getSpotsReservations();
             getSpots();
@@ -93,6 +92,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
         }
         return buffer;
     }
+
     const reserveSpot = async(e)=>{
         e.preventDefault();
         // getSpotsReservations();
