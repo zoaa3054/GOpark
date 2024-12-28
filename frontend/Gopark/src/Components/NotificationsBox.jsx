@@ -37,11 +37,10 @@ const NotificationsBox = ({ userId, showNotificationsBox, setShowNotificationsBo
             <Modal
                 isOpen={showNotificationsBox}
                 onRequestClose={()=>setShowNotificationsBox(false)}
-                style={{overFlowY:"scroll"}}
             >
                 <button className="backButton" onClick={()=>setShowNotificationsBox(false)}>X</button>
                 <center><h1>Notifications</h1></center>
-                <div className="notificationsBox">
+                <div className="notificationsBox" >
                     {notifications.map((notification, i)=>(
                         <div className="notificationCard" key={i}>
                             <big>{notification.content}</big>
