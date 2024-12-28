@@ -23,7 +23,7 @@ public class ParkingSimulator {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(fixedRate = 5 * 60000) // Executes every minute
+    @Scheduled(fixedRate = 60000) 
     public void updateReservationsAndParkingSpots() {
         try {
             // Query to retrieve active reservations with null arrival

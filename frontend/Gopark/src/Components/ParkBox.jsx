@@ -191,10 +191,10 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
                 <button className='backButton' style={{marginRight:"1rem"}} onClick={()=>{setShowOriginInput((prev)=>!prev); setTimeout(()=>{handleScroll()}, 100)}}>Get directions</button>
                 <button className='backButton' onClick={()=>{setShowReservationForm((prev)=>!prev); setTimeout(()=>{handleScroll()}, 100)}}>Reserve</button>
                 </div>}
-            {showOriginInput && <center style={{display:"flex", justifyContent:"center"}}><Autocomplete options={{componentRestrictions: { country: "br" }}}>
+            {showOriginInput && <center style={{display:"flex", justifyContent:"center"}}><Autocomplete>
                                             <input type="text" placeholder="Origin"  ref={origin}/>
                                         </Autocomplete>
-                                        <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, lot.location)}>Go</button>
+                                        <button className="backButton" style={{marginLeft:"2rem"}} onClick={()=>getRout(origin.current.value, {lat: parseFloat(lot.latitude), lng: parseFloat(lot.longitude)})}>Go</button>
                                         </center>}
             {showReservationForm && <center style={{display:"flex", justifyContent:"center"}}>
                                         <form onSubmit={reserveSpot} style={{display:"grid", border: "0.5px solid gray", padding:"1rem", borderRadius:"20px"}}>

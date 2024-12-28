@@ -88,6 +88,7 @@ const MainPage = () => {
     }
 
     const getRout = async (origin, destination)=>{
+        console.log(origin, destination);
         if(origin === '')
             return
         const destinationService = new google.maps.DirectionsService();
@@ -124,9 +125,7 @@ const MainPage = () => {
         <center className="navigationBox">
             <center className="routerBox">
                 <Autocomplete
-                options={{
-                    componentRestrictions: { country: "br" }, // Restrict to United States
-                  }}
+                
                 >
                     <input type="text" placeholder="Destination" style={{marginRight:"2rem"}} ref={destination}/>
                 </Autocomplete>
