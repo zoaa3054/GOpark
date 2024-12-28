@@ -36,6 +36,84 @@ public class ParkingLotDAO {
         });
     }
 
+    public List<ParkingLot> deleteLot(int id){
+        String sqlForLotViolationDeletion = "DELETE FROM Violation WHERE reservation_id in (SELECT id FROM reservation WHERE reservation.lot_id = ?)";
+        jdbcTemplate.update(sqlForLotViolationDeletion, id);
+        String sqlForLotReservationsDeletion = "DELETE FROM Reservation WHERE lot_id = ?";
+        jdbcTemplate.update(sqlForLotReservationsDeletion, id);
+        String sqlForLotSpotsDeletion = "DELETE FROM Parking_Spot WHERE parking_lot_id = ?";
+        jdbcTemplate.update(sqlForLotSpotsDeletion, id);
+        String sqlForLotDeletion = "DELETE FROM Parking_Lot WHERE id = ?";
+        jdbcTemplate.update(sqlForLotDeletion, id);
+        return getLots();
+    }
+
+    public List<ParkingLot> addParkingLot(ParkingLot parkingLot, int numberOfRequlerSpots, int numberOfDisapledSpots, int numberOfEVChargingSpots, String managerEmail, String managerPassword){
+        List<ParkingLot> resultLots = null;
+        ManagerDAO managerDAO = new ManagerDAO(jdbcTemplate);
+        Manager manager = null;
+        try {
+            manager = managerDAO.login(managerEmail, managerPassword);
+        }catch (Exception e){
+            throw e;
+        }
+
+        String sqlForLot = "INSERT INTO parking_lot (longitude, latitude, base_Price, name, manager_Id, total_Spots, occupied_Spots, current_Price) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            int rowsAffectedByLotInsertion = jdbcTemplate.update(sqlForLot,
+                    parkingLot.getLongitude(),
+                    parkingLot.getLatitude(),
+                    parkingLot.getBasePrice(),
+                    parkingLot.getName(),
+                    manager.getId(),
+                    parkingLot.getTotalSpots(),
+                    0,
+                    parkingLot.getBasePrice()
+                    );
+
+            if (rowsAffectedByLotInsertion > 0) {
+                resultLots = getLots();
+                long currentLotId = resultLots.get(resultLots.size()-1).getId();
+                String sqlForSpots = "INSERT INTO parking_spot (parking_lot_id, number, type, state) " +
+                        "VALUES (?, ?, ?, ?)";
+                for (int i=1; i<=parkingLot.getTotalSpots(); i++) {
+                    String type = null;
+                    if (numberOfRequlerSpots > 0){
+                        type = "regular";
+                        --numberOfRequlerSpots;
+                    }
+                    else if (numberOfDisapledSpots > 0){
+                        type = "disapled";
+                        --numberOfDisapledSpots;
+                    }
+                    else {
+                        type = "EV charging";
+                        --numberOfEVChargingSpots;
+                    }
+                    try {
+                        int rowsAffectedBySpotsInsection = jdbcTemplate.update(sqlForSpots,
+                                currentLotId,
+                                i,
+                                type,
+                                "available"
+                        );
+                        if (rowsAffectedBySpotsInsection == 0) {
+                            throw new RuntimeException("Failed to insert lot: No rows affected");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to insert spot: " + e.getMessage(), e);
+                    }
+                }
+                return resultLots;
+            } else {
+                throw new RuntimeException("Failed to insert lot: No rows affected");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to insert lot: " + e.getMessage(), e);
+        }
+    }
+
     public List<ParkingSpot> getSpotsInLot(int id) {
         String sql = "SELECT * FROM Parking_Spot WHERE parking_Lot_Id = ?";
 

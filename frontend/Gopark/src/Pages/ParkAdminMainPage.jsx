@@ -5,17 +5,16 @@ import { toast } from "react-toastify";
 const ParkAdminMainPage = () =>{
     const location = useLocation();
     const { admin } = location.state || {};
-    // const [loadedLot, setLoadedLot] = useState({id: 5, location: {lat: -7.745, lng: -38.523},  name: "Safaa", totalSpots: 4, currentPrice: 30,});
-    const [loadedLot, setLoadedLot] = useState({});
+    const [loadedLot, setLoadedLot] = useState(null);
     const [spots, setSpots] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formVariables, setFormVariables] = useState({});
-    const [parksLoaded, setParksLoaded] = useState([]);
+    // const [parksLoaded, setParksLoaded] = useState([]);
     const navigate = useNavigate();
 
     useEffect(()=>{
         loadPark();
-        setFormVariables({name: loadedLot.name, totalSpots: loadedLot.totalSpots, type: loadedLot.type, pricingStruct: loadedLot.pricingStruct});
+        // setFormVariables({name: loadedLot.name, totalSpots: loadedLot.totalSpots, type: loadedLot.type, pricingStruct: loadedLot.pricingStruct});
     }, []);
    
 
@@ -24,7 +23,6 @@ const ParkAdminMainPage = () =>{
         await fetch(`http://localhost:8081/api/v1/users/getLots`)
         .then(respond=>respond.status==200 || respond.status==201? (()=>{return respond.json()})(): (()=>{throw Error("Failed loading parks")})())
         .then((parksData)=>{
-            console.log(parksData, admin.id);
             if (parksData.length != 0){
                 for (let i=0; i<parksData.length; i++){
                     if (admin.id == parksData[i].managerId)
@@ -103,14 +101,12 @@ const ParkAdminMainPage = () =>{
     }
     return(
     <>
-        {!isEditing &&<>
+        {loadedLot? <>
         <ParkBox lot={loadedLot} person="admin" loadSpots={setSpots}/>
         <div style={{display:"flex", justifyContent:"center"}}>
-            <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>setIsEditing(true)}>Edit</button>
+            {/* <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>setIsEditing(true)}>Edit</button> */}
             <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>navigate('/')} >logout</button>
-            {/* <button className="backButton" style={{marginRight:"1rem"}} onClick={reserveAll}>Reserve All</button>
-            <button className="backButton" onClick={generateReport}>Generate Report</button> */}
-        </div></>
+        </div></>:<p color="white">Loading...</p>
         }
         {isEditing && <div style={{margin:"1rem"}}>
             <label htmlFor="name">Name:</label>

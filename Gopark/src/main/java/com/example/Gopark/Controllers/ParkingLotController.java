@@ -5,10 +5,7 @@ import com.example.Gopark.Classes.ParkingLot;
 import com.example.Gopark.Classes.ParkingSpot;
 import com.example.Gopark.Services.ParkingLotService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @CrossOrigin("http://localhost:8080")
@@ -33,6 +30,18 @@ public class ParkingLotController {
     public List<ParkingLot> getLotsByLocation()
     {
         return parkingLotService.getAllParkingLots();
+    }
+
+    @DeleteMapping("/api/v1/users/deleteLot/{id}")
+    public List<ParkingLot> deleteLot(@PathVariable int id)
+    {
+        return parkingLotService.deleteParkingLot(id);
+    }
+
+    @PostMapping("/api/v1/system/admin/addLot")
+    public List<ParkingLot> addLot(@RequestBody ParkingLot parkingLot, @RequestHeader("numberOfRequlerSpots") int numberOfRequlerSpots, @RequestHeader("numberOfDisapledSpots") int numberOfDisapledSpots, @RequestHeader("numberOfEVChargingSpots") int numberOfEVChargingSpots, @RequestHeader("ManagerEmail") String managerEmail, @RequestHeader("ManagerPassword") String managerPassword)
+    {
+        return parkingLotService.addParkingLot(parkingLot, numberOfRequlerSpots, numberOfDisapledSpots, numberOfEVChargingSpots, managerEmail, managerPassword);
     }
 
 }

@@ -10,7 +10,7 @@ if (typeof global === "undefined") {
 
 
 const NotificationsBox = ({ userId, showNotificationsBox }) =>{
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState([{content: "lskjfd", time: "5"}]);
     useEffect(()=>{
         getNotifications();
     }, [userId]);
@@ -32,7 +32,7 @@ const NotificationsBox = ({ userId, showNotificationsBox }) =>{
     }
     return(
         <div className="notificationsBox" style={{transform: `${showNotificationsBox?"translate(0%, 0%)":"translate(0%, 0%)"}`}}>
-            <Notification handleNotification={handleNotification} driverID={userId}/>
+            {/* <Notification handleNotification={handleNotification} driverID={userId}/> */}
             {notifications.map((notification, i)=>(
                 <div className="notificationCard" key={i}>
                     <big>{notification.content}</big>

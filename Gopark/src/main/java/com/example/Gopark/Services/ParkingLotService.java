@@ -23,5 +23,12 @@ public class ParkingLotService {
        return parkingLotDAO.getLots();
     }
 
+    public List<ParkingLot> deleteParkingLot(int id){
+        return parkingLotDAO.deleteLot(id);
+    }
+
+    public  List<ParkingLot> addParkingLot(ParkingLot parkingLot, int numberOfRequlerSpots, int numberOfDisapledSpots, int numberOfEVChargingSpots, String managerEmail, String managerPassword){
+        return parkingLotDAO.addParkingLot(parkingLot, numberOfRequlerSpots, numberOfDisapledSpots, numberOfEVChargingSpots, managerEmail, managerPassword);
+    }
 
 }

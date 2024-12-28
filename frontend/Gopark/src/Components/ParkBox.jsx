@@ -38,9 +38,10 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
 
     // useEffect refreshes the spots every second
     useEffect(()=>{
+        console.log("loaded park: ", lot);
         let interval = setInterval(()=>{
             if (person == "user") getSpotsReservations();
-            // getSpots();
+            getSpots();
         }, 1000);
 
         setFirstHalfSpots(()=>parkSpots.slice(0, Math.ceil(parkSpots.length / 2)));

@@ -34,6 +34,11 @@ const SystemAdminMainPage = () =>{
     //     }]);
     const [parksLoaded, setParksLoaded] = useState([]);
     const [formVariables, setFormVariables] = useState({});
+    const [newParkingLotManagerEmail, setNewParkingLotManagerEmail] = useState('');
+    const [newParkingLotManagerPassword, setNewParkingLotManagerPassword] = useState('');
+    const [newNumberOfRequlerSpots, setNewNumberOfRequlerSpots] = useState(0);
+    const [newNumberOfDisapledSpots, setNewNumberOfDisapledSpots] = useState(0);
+    const [newNumberOfEVChargingSpots, setNewNumberOfEVChargingSpots] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedLot, setSelectedLot] = useState({});
     const [spots, setSpots] = useState([]);
@@ -71,41 +76,63 @@ const SystemAdminMainPage = () =>{
     }
 
     const notifyFaildAdding=()=>{
-        toast.error("Faild to add the lot");
+        toast.error("Faild to add the lot: Check username/password of the given park admin that it exists");
     }
 
     const notifyFailiar=(message)=>{
         toast.error(message);
     }
 
+    const notifySuccess=(message)=>{
+        toast.success(message);
+    }
+
     const addLot = async()=>{
-        console.log({ID:"", ...formVariables});
+        
+        console.log({...formVariables,
+            ['latitude']: parseFloat(formVariables.latitude),
+            ['longitude']: parseFloat(formVariables.longitude),
+            ['basePrice']: parseFloat(formVariables.basePrice),
+            'ManagerEmail': newParkingLotManagerEmail,
+            'ManagerPassword': newParkingLotManagerPassword,
+            'numberOfRequlerSpots': parseInt(newNumberOfRequlerSpots),
+            'numberOfDisapledSpots': parseInt(newNumberOfDisapledSpots),
+            'numberOfEVChargingSpots': parseInt(newNumberOfEVChargingSpots)
+        });
         await fetch(`http://localhost:8081/api/v1/system/admin/addLot`, {
             method:"POST",
+            headers:{
+                'Content-Type': 'application/json',
+                'ManagerEmail': newParkingLotManagerEmail,
+                'ManagerPassword': newParkingLotManagerPassword,
+                'numberOfRequlerSpots': parseInt(newNumberOfRequlerSpots),
+                'numberOfDisapledSpots': parseInt(newNumberOfDisapledSpots),
+                'numberOfEVChargingSpots': parseInt(newNumberOfEVChargingSpots)
+            },
             body:JSON.stringify({
-                ID: "", 
-                ...formVariables
+                ...formVariables, 
+                ['latitude']: parseFloat(formVariables.latitude),
+                ['longitude']: parseFloat(formVariables.longitude),
+                ['basePrice']: parseFloat(formVariables.basePrice),
+                'totalSpots': parseInt(newNumberOfRequlerSpots)+parseInt(newNumberOfDisapledSpots)+parseInt(newNumberOfEVChargingSpots)
             })
         })
         .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error adding a lot")})())
-        .then(newLots=>{setLoadedLots(newLots); notifySuccessAdding(); setIsEditing(false);})
+        .then(newLots=>{setParksLoaded(newLots); notifySuccessAdding(); setIsEditing(false);})
         .catch(e=>{console.error(e); notifyFaildAdding()});
     }
 
     const deleteLot = async(lot)=>{
         const confirm = window.confirm(`Are you sure you wish to delete ${lot.name} lot?`);
         if (!confirm) return;
-        await fetch(`http://localhost:8081/api/v1/system/admin/deleteLot?ID=${lot}`, {
+        await fetch(`http://localhost:8081/api/v1/users/deleteLot/${lot.id}`, {
             method:"DELETE"
         })
         .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error adding a lot")})())
-        .then(newLots=>{setLoadedLots(newLots); notifySuccessDeleting();})
+        .then(newLots=>{setParksLoaded(newLots); notifySuccessDeleting();})
         .catch(e=>{console.error(e); notifyFaildDeleting();});
     }
 
-    const generateReport = async(lot)=>{
-
-    }
     const hideLot = () =>{
         setShowLotSwitchAnimation(false); setTimeout(()=>{setShowLotSwitch(false)}, 500);
     }
@@ -137,6 +164,7 @@ const SystemAdminMainPage = () =>{
 
     const createReport = async()=>{
         await fetch(`http://localhost:8081/admin/report`)
+        .then(response=>{if (response.status == 200 || response.status==201) notifySuccess("Report downloaded succeffully");})
         .catch(e=>{console.error(e); notifyFailiar("Couldn't create report");});
     }
 
@@ -147,7 +175,7 @@ const SystemAdminMainPage = () =>{
                     <img src={addLotIcon} className="navBarButton" style={{width:"3rem", height:"3rem", cursor:"pointer"}} title="Add Lot"/>
                 </div>
                 <div onClick={createReport}>
-                    <img src={downloadReportIcon} className="navBarButton" style={{width:"3rem", height:"3rem", cursor:"pointer"}} title="Add Lot"/>
+                    <img src={downloadReportIcon} className="navBarButton" style={{width:"3rem", height:"3rem", cursor:"pointer"}} title="Download Report for all parks"/>
                 </div>
                 <div style={{width: "75%", textAlign: "center", color: "#ADEFD1FF"}}><h1>GOpark System Admin</h1></div>
                 <div onClick={showAddAdminBox}>
@@ -172,20 +200,24 @@ const SystemAdminMainPage = () =>{
             {isEditing && <div style={{margin:"1rem"}}>
             <label htmlFor="name">Name:</label>
             <input type="text" name="name" onChange={handleChange} value={formVariables.name} placeholder="Name"/>
-            <label htmlFor="locationCoor">Location Coordinates (lat, lng):</label>
-            <input type="text" name="locationCoor" onChange={handleChange} value={formVariables.locationCoor} placeholder="location Coordinates"/>
-            <label htmlFor="capacity">Capacity:</label>
-            <input type="number" name="capacity" onChange={handleChange} value={formVariables.capacity} placeholder="Capacity"/>
-            <label htmlFor="type">Type:</label>
-            <input type="text" name="type" onChange={handleChange} value={formVariables.type} placeholder="Type"/>
-            <label htmlFor="pricingStruct">Pricing Structure:</label>
-            <input type="text" name="pricingStruct" onChange={handleChange} value={formVariables.pricingStruct} placeholder="Pricing Structure"/>
-            <label htmlFor="adminUserName">Lot Admin Username:</label>
-            <input type="text" name="adminUserName" onChange={handleChange} value={formVariables.adminUserName} placeholder="Admin Username"/>
+            <label htmlFor="latitude">Location Latitude:</label>
+            <input type="text" name="latitude" onChange={handleChange} value={formVariables.locationLat} pattern="^-?\d+(\.\d+)?$" title="Enter a valid float number" placeholder="Location Latitude"/>
+            <label htmlFor="longitude">Location Longtude:</label>
+            <input type="text" name="longitude" onChange={handleChange} value={formVariables.locationLng} pattern="^-?\d+(\.\d+)?$" title="Enter a valid float number" placeholder="Location Longtude"/>
+            <label htmlFor="numberOfRequlerSpots">Number of Regular Spots:</label>
+            <input type="number" name="numberOfRequlerSpots" onChange={(e)=>setNewNumberOfRequlerSpots(e.target.value)} pattern="^[0-9]+$" title="Please enter a positive integer or zero" value={newNumberOfRequlerSpots} placeholder="Number of Regular Spots"/>
+            <label htmlFor="numberOfDisapledSpots">Number of Spots for Disabled:</label>
+            <input type="number" name="numberOfDisapledSpots" onChange={(e)=>setNewNumberOfDisapledSpots(e.target.value)} pattern="^[0-9]+$" title="Please enter a positive integer or zero" value={newNumberOfDisapledSpots} placeholder="Number of Spots for Disabled"/>
+            <label htmlFor="numberOfEVChargingSpots">Number of EV charging supporting Spots:</label>
+            <input type="number" name="numberOfEVChargingSpots" onChange={(e)=>setNewNumberOfEVChargingSpots(e.target.value)} pattern="^[0-9]+$" title="Please enter a positive integer or zero" value={newNumberOfEVChargingSpots} placeholder="Number of EV charging supporting Spots"/>
+            <label htmlFor="basePrice">Base Price:</label>
+            <input type="text" name="basePrice" onChange={handleChange} value={formVariables.pricingStruct} pattern="^\d*\.?\d+$" title="Please enter a positive number" placeholder="Base Price"/>
+            <label htmlFor="adminEmail">Lot Admin Email:</label>
+            <input type="email" name="adminEmail" onChange={(e)=>setNewParkingLotManagerEmail(e.target.value)} value={newParkingLotManagerEmail} placeholder="Admin Email"/>
             <label htmlFor="adminPassword">Lot Admin Password:</label>
-            <input type="text" name="adminPassword" onChange={handleChange} value={formVariables.adminPassword} placeholder="Admin Password"/>
+            <input type="password" name="adminPassword" onChange={(e)=>setNewParkingLotManagerPassword(e.target.value)} value={newParkingLotManagerPassword} placeholder="Admin Password"/>
             <div style={{display:"flex", justifyContent:"center"}}>
-                <button style={{marginRight:"1rem"}} onClick={addLot} className="backButton">Save</button>
+                <button style={{marginRight:"1rem"}} onClick={addLot} className="backButton">Add</button>
                 <button onClick={handleCancel} className="backButton">Cancel</button>
             </div>
         </div>}
@@ -196,7 +228,6 @@ const SystemAdminMainPage = () =>{
                 >
                 <button className="backButton" onClick={hideLot}>X</button>
                 <ParkBox lot={selectedLot} person="admin" loadSpots={setSpots}/>
-                <center><button className="backButton" onClick={()=>generateReport(selectedLot)}>Generate Report</button></center>
 
             </Modal>
             <Modal 
