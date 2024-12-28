@@ -23,7 +23,7 @@ public class ParkingSimulator {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(fixedRate = 60000) 
+    @Scheduled(fixedRate = 60000)
     public void updateReservationsAndParkingSpots() {
         try {
             // Query to retrieve active reservations with null arrival

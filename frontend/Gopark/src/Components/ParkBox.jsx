@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import '../style.css';
 import PropTypes from 'prop-types';
 import { toast } from "react-toastify";
+import RegularIcon from "../assets/Regular.png";
+import DisabledIcon from "../assets/Disabled.png";
+import EVChargingIcon from "../assets/EVCharging.png";
 
 const statusColorMaper = {
     'occupied': 'red',
@@ -174,15 +177,26 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
             <div className='parkingLots'>
                 <div className='leftLots'>
                     {firstHalfSpots.map((l, i)=>(
-                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.realTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
+                        <div className='lot' key={i} style={{color:"white" ,border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i ?statusColorMaper[l.realTimeState]:'#cccccc8a'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
                             <p>{l.number}</p>
+                            <img src={(()=>{
+                                if (l.type == 'regular') return RegularIcon;
+                                else if (l.type == 'disabled') return DisabledIcon;
+                                else return EVChargingIcon;
+                            })()} style={{marginLeft:"0.5rem"}}/>
                         </div>)
                     )}
                 </div>
                 <div className='rightLots'>
                     {secondHalfSpots.map((l, i)=>(
-                        <div className='lot' key={i+firstHalfSpots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfSpots.length ?statusColorMaper[l.realTimeState]:'transparent'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
+                        <div className='lot' key={i+firstHalfSpots.length} style={{color: "white", border:`2px solid ${statusColorMaper[l.realTimeState]}`, backgroundColor:isHoverd && hoverdObj==i+firstHalfSpots.length ?statusColorMaper[l.realTimeState]:'#cccccc8a'}} onMouseEnter={(e)=>{setIsHoverd(()=>true); setHoverdObj(e._targetInst.key);}} onMouseLeave={()=>setIsHoverd(()=>false)}>
+                            <img src={(()=>{
+                                if (l.type == 'regular') return RegularIcon;
+                                else if (l.type == 'disabled') return DisabledIcon;
+                                else return EVChargingIcon;
+                            })()} style={{marginRight:"0.5rem"}}/>
                             <p>{l.number}</p>
+                            
                         </div>)
                     )}
                 </div>

@@ -188,9 +188,8 @@ const SystemAdminMainPage = () =>{
             {!isEditing && parksLoaded.map((lot, i)=>(
                 <div  key={i} className="parkCard">
                     <div style={{width:"100%"}} onClick={()=>showLot(lot)}>
-                        <p>{lot.name}</p>
-                        <p>{lot.type}</p>
-                        <p>{lot.capacity}</p>
+                        <p style={{fontSize:"2.5rem"}}>{lot.name}</p>
+                        <p>Capacity: {lot.totalSpots}</p>
                     </div>
                     <button onClick={()=>deleteLot(lot)} className="backButton" >
                         <img src={binIcon} alt="binIcon" title="Delete Lot"/>
