@@ -32,7 +32,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const [fromDay, setFromDay] = useState('');
     const [toDay, setToDay] = useState('');
     const [type, setType] = useState('regular');
-    const [counter, setCounter] = useState(0);
+    const [cost, setCost] = useState('');
     const origin = useRef();
     const targetRef = useRef(null);
 
@@ -66,7 +66,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
     const getSpots = async()=>{
         await fetch(`http://localhost:8081/api/v1/getSpots/${lot.id}`)
         .then(response=>response.status==200 || response.status==201? (()=>{return response.json()})(): (()=>{throw Error("Error fetching spots")})())
-        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots); console.log("spots: ",spots);})
+        .then(spots=>{setParkSpots(()=>spots); loadSpots(()=>spots);})
         .catch(e=>console.error(e));
     }    
 
@@ -93,15 +93,34 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
         return buffer;
     }
 
+    const getCost = async(startTime, endTime, lotId)=>{
+        console.log({
+            startTime,
+            endTime,
+            lotId
+        });
+        await fetch(`http://localhost:8081/users/getCost`, {
+            method:"GET", 
+            headers:{
+                startTime,
+                endTime,
+                lotId
+            }
+        })
+        .then(response=>response.status==200||response.status==201?(()=>{return response.text()})():(()=>{throw Error("Error getting cost")})())
+        .then(costData=>{setCost(costData); console.log("cost: ", costData)})
+        .catch(e=>console.error(e));
+    }
+
     const reserveSpot = async(e)=>{
         e.preventDefault();
         // getSpotsReservations();
         const startTimeAsTimeStamp = new Date(`${fromDay}T${fromTime}:00`).getTime();
         const endTimeAsTimeStamp = new Date(`${toDay}T${toTime}:00`).getTime();
+        getCost(new Date(`${fromDay}T${fromTime}:00`).toISOString(), new Date(`${toDay}T${toTime}:00`).toISOString(), lot.id);
         let availableSpot = null;
         let spotsByGivenType = getSpotsByType(type);
         let violatedFlag = false;
-        console.log("reservations here: ", spotsReservations);
         for (let i=0; i<spotsByGivenType.length; i++){
             violatedFlag = false;
             if (spotsReservations.length == 0) availableSpot = spotsByGivenType[i];
@@ -123,7 +142,7 @@ const ParkBox = ({ lot, person, user, getRout, loadSpots }) =>{
             if (!violatedFlag) break;
         }
         if (!violatedFlag){
-            const confermation = window.confirm(`You are now about to reserve spot number: ${availableSpot.number} in ${lot.name} lot\nPress confirm to conferm your reservation.`);
+            const confermation = window.confirm(`You are now about to reserve spot number: ${availableSpot.number} in ${lot.name} lot\nYour total cost will be ${cost}\nPress confirm to confirm your reservation.`);
             if (confermation){
                 const regester = await fetch(`http://localhost:8081/users/reserveSpot`, {
                     method: 'POST',

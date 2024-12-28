@@ -7,7 +7,7 @@ import com.example.Gopark.Classes.Reservation;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
+import java.sql.Timestamp;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +26,11 @@ public class ReservationDAO {
     public long getManagerRevenues(long lotId) {
         String sql = "SELECT SUM(cost) AS total_revenue FROM Reservation WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(sql, Long.class, lotId);
+    }
+
+    public float getCost(Timestamp startTime, Timestamp endTime, Long lotId){
+        String sql = "SELECT Get_Price_Future(?, ?, ?)";
+        return jdbcTemplate.queryForObject(sql,Float.class, startTime, endTime, lotId);
     }
 
     public void insertReservation(Reservation reservation) {
