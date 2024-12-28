@@ -142,7 +142,7 @@ const MainPage = () => {
                     src={notificationIcon}
                     alt="notificationPhoto"
                     className="notificationsIcon"
-                    onClick={()=>setShowNotificationsBox((prev)=>!prev)}
+                    onClick={()=>setShowNotificationsBox(true)}
                 />
                 {directions && <p style={{backgroundColor:"#ADEFD1FF", color:"#00203FFF", borderRadius:"20px", padding:"0.5rem"}}>Distance: {distance} | Duration: {duration}</p>}
             </center>
@@ -170,7 +170,7 @@ const MainPage = () => {
             ))
         }
         </MarkerClusterer>}
-        <NotificationsBox showNotificationsBox={showNotificationsBox} userId={user.id}/>
+        <NotificationsBox showNotificationsBox={showNotificationsBox} setShowNotificationsBox={setShowNotificationsBox} userId={user.id}/>
         {directions && <DirectionsRenderer directions={directions}/>}
     </GoogleMap>
     <Modal 
