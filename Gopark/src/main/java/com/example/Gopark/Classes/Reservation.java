@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class Reservation {
     int id;
-    int driverId;
+    long driverId;
     int lotId;
     int spotNumber;
     Timestamp startTime;

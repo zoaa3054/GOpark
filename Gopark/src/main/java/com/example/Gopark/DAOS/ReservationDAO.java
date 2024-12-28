@@ -64,7 +64,7 @@ public class ReservationDAO {
             public Reservation mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Reservation reservation = new Reservation();
                 reservation.setId(rs.getInt("id"));
-                reservation.setDriverId(rs.getInt("driver_id"));
+                reservation.setDriverId(rs.getLong("driver_id"));
                 reservation.setLotId(rs.getInt("lot_id"));
                 reservation.setSpotNumber(rs.getInt("spot_number"));
                 reservation.setStartTime(rs.getTimestamp("start_time"));

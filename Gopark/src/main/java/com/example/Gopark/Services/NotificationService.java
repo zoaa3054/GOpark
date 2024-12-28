@@ -26,15 +26,11 @@ public class NotificationService {
     {
             String sql = "INSERT INTO driver_notification (driver_id, content, time) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, driverId, message.getContent(), message.getTime());
-           String topic = "/topic/driver/" + driverId;
-           this.messagingTemplate.convertAndSend(topic,message);
     }
     public void sendMessageToManager(Long managerId, NotificationMessage message)
     {
         String sql = "INSERT INTO manager_notification (manager_id, content, time) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, managerId, message.getContent(), message.getTime());
-        String topic = "/topic/manager/" + managerId;
-        this.messagingTemplate.convertAndSend(topic,message);
     }
 
     public List<NotificationMessage> getAllDriverNotifications(Long driverId)
@@ -43,7 +39,7 @@ public class NotificationService {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             NotificationMessage message = new NotificationMessage();
             message.setContent(rs.getString("content"));
-            message.setTime(rs.getTime("time"));
+            message.setTime(rs.getTimestamp("time"));
             return message;
         }, driverId);
     }
