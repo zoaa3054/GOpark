@@ -104,8 +104,8 @@ const ParkAdminMainPage = () =>{
         {loadedLot? <>
         <ParkBox lot={loadedLot} person="admin" loadSpots={setSpots}/>
         <div style={{display:"flex", justifyContent:"center"}}>
-            {/* <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>setIsEditing(true)}>Edit</button> */}
-            <button style={{marginRight:"1rem"}} className="backButton" onClick={()=>navigate('/')} >logout</button>
+            <button style={{marginRight:"1rem"}} className="backButton" onClick={generateReport}>Print Report</button>
+            <button className="backButton" onClick={()=>navigate('/')} >logout</button>
         </div></>:<p color="white">Loading...</p>
         }
         {isEditing && <div style={{margin:"1rem"}}>
